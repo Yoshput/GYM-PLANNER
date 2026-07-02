@@ -295,6 +295,7 @@ const GOAL_OPTIONS: { value: Goal; label: string; desc: string; emoji: string }[
   { value: "cutting", label: "Fat Loss (Cutting)", desc: "Menurunkan kadar lemak tubuh dan mengencangkan otot.", emoji: "🔥" },
   { value: "bulking", label: "Muscle Gain (Bulking)", desc: "Menambah ukuran otot dan kekuatan fisik secara progresif.", emoji: "💪" },
   { value: "maintenance", label: "General Fitness", desc: "Menjaga stamina, kebugaran, dan mobilitas sendi.", emoji: "⚡" },
+  { value: "powerlifting", label: "Powerlifting", desc: "Program Big 3 (Squat, Bench, Deadlift) berbasis kekuatan & peaking untuk kompetisi.", emoji: "🏋️" },
 ];
 
 function StepGoal({ goal, setGoal }: { goal: Goal | null; setGoal: (g: Goal) => void }) {

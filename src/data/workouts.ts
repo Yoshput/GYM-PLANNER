@@ -258,6 +258,87 @@ const EX = {
     equipment: "Tali Skipping",
     imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop&q=80",
   }),
+  // ── Powerlifting-specific exercises ──
+  pauseSquat: () => ({
+    id: "pause-squat",
+    name: "Pause Squat",
+    targetMuscle: "Paha Depan (Quads), Bokong (Glutes), Otot Inti",
+    cue: "Turunkan ke posisi bawah, tahan 2-3 detik tanpa memantul, lalu dorong kembali ke atas dengan kuat. Melatih kekuatan dari titik terendah.",
+    equipment: "Barbell + Rak",
+    imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80",
+  }),
+  frontSquat: () => ({
+    id: "front-squat",
+    name: "Front Squat",
+    targetMuscle: "Paha Depan (Quads), Otot Inti, Punggung Atas",
+    cue: "Letakkan barbell di depan bahu (bukan tengkuk), siku sejajar lantai, jaga punggung tegak saat turun.",
+    equipment: "Barbell + Rak",
+    imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80",
+  }),
+  cgBench: () => ({
+    id: "close-grip-bench",
+    name: "Close-Grip Bench Press",
+    targetMuscle: "Tricep, Dada Tengah",
+    cue: "Pegang barbell selebar bahu (lebih sempit dari bench press biasa), tekuk siku ke arah samping badan. Sangat efektif melatih kekuatan lockout tricep.",
+    equipment: "Barbell + Bangku (Bench)",
+    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80",
+  }),
+  pauseBench: () => ({
+    id: "pause-bench",
+    name: "Pause Bench Press",
+    targetMuscle: "Dada, Tricep, Bahu Depan",
+    cue: "Turunkan barbell ke dada, tahan 1-2 detik tanpa memantul, lalu dorong penuh. Melatih kekuatan off the chest yang penting di kompetisi.",
+    equipment: "Barbell + Bangku (Bench)",
+    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80",
+  }),
+  sumoDeadlift: () => ({
+    id: "sumo-deadlift",
+    name: "Sumo Deadlift",
+    targetMuscle: "Paha Dalam (Adductor), Bokong (Glutes), Punggung",
+    cue: "Buka kaki lebar, arahkan jari kaki ke luar 45°, genggam barbell antara kedua kaki. Dorong lantai menjauhi tubuh, bukan angkat beban ke atas.",
+    equipment: "Barbell",
+    imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80",
+  }),
+  blockPull: () => ({
+    id: "block-pull",
+    name: "Block Pull / Rack Pull",
+    targetMuscle: "Punggung Atas, Trap, Bokong (Glutes)",
+    cue: "Mulai dari posisi setengah (barbell di atas lutut menggunakan blok/rack pin). Fokus melatih lockout dan kekuatan punggung atas.",
+    equipment: "Barbell + Blok / Power Rack",
+    imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80",
+  }),
+  goodMorning: () => ({
+    id: "good-morning",
+    name: "Good Morning",
+    targetMuscle: "Paha Belakang (Hamstring), Punggung Bawah (Erector)",
+    cue: "Taruh barbell di tengkuk, tekuk pinggul ke depan hingga badan hampir sejajar lantai, lalu tegakkan kembali. Melatih kekuatan hip hinge untuk deadlift.",
+    equipment: "Barbell",
+    imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80",
+  }),
+  bentOverRow: () => ({
+    id: "bent-over-row-pl",
+    name: "Pendlay Row",
+    targetMuscle: "Punggung Tengah, Lats, Bahu Belakang",
+    cue: "Mulai setiap rep dari lantai (bukan menggantung), badan sejajar lantai, tarik barbell eksplosif ke perut. Membangun kekuatan punggung untuk deadlift.",
+    equipment: "Barbell",
+    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80",
+  }),
+  beltSquat: () => ({
+    id: "belt-squat",
+    name: "Belt Squat / Sissy Squat",
+    targetMuscle: "Paha Depan (Quads)",
+    cue: "Aksesori squat tanpa beban di punggung. Fokuskan tekanan murni pada otot kaki tanpa melelahkan punggung yang sudah berat bekerja.",
+    equipment: "Mesin Belt Squat / Sissy Squat",
+    imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80",
+  }),
+  tricepDip: () => ({
+    id: "tricep-dip-pl",
+    name: "Weighted Tricep Dip",
+    targetMuscle: "Tricep Longhead, Dada Bawah",
+    cue: "Tambahkan beban menggunakan dip belt. Tubuh tetap tegak (tidak condong) agar fokus pada tricep sebagai otot utama lockout bench press.",
+    equipment: "Tiang Dip + Dip Belt",
+    imageUrl: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop&q=80",
+  }),
 } as const;
 
 type ExKey = keyof typeof EX;
@@ -279,16 +360,19 @@ const PRESCRIPTION_MATRIX: Record<ExperienceLevel, Record<Goal, Prescription>> =
     cutting: { sets: 3, reps: "12-15", intensity: "Low", restSeconds: 45 },
     maintenance: { sets: 3, reps: "10-12", intensity: "Moderate", restSeconds: 60 },
     bulking: { sets: 4, reps: "10-12", intensity: "Moderate", restSeconds: 75 },
+    powerlifting: { sets: 5, reps: "5", intensity: "High", restSeconds: 180 },
   },
   intermediate: {
     cutting: { sets: 4, reps: "12-15", intensity: "Moderate", restSeconds: 60 },
     maintenance: { sets: 4, reps: "8-12", intensity: "Moderate", restSeconds: 75 },
     bulking: { sets: 4, reps: "8-10", intensity: "High", restSeconds: 90 },
+    powerlifting: { sets: 5, reps: "3-5", intensity: "Max", restSeconds: 240 },
   },
   expert: {
     cutting: { sets: 4, reps: "10-12", intensity: "High", restSeconds: 60 },
     maintenance: { sets: 5, reps: "6-10", intensity: "High", restSeconds: 90 },
     bulking: { sets: 5, reps: "6-8", intensity: "Max", restSeconds: 120 },
+    powerlifting: { sets: 5, reps: "1-3", intensity: "Max", restSeconds: 300 },
   },
 };
 
@@ -351,6 +435,21 @@ const EXPERT_TEMPLATE: SplitTemplate = {
   sunday: { label: "Rest Day", focus: "Full Recovery", isRestDay: true, keys: [] },
 };
 
+/**
+ * POWERLIFTING TEMPLATE — 4-Day Frequency Block
+ * Squat Day / Bench Day / Rest / Deadlift Day / Accessories / Rest / Rest
+ * Focuses on the Big 3 competition lifts + targeted accessories.
+ */
+const POWERLIFTING_TEMPLATE: SplitTemplate = {
+  monday: { label: "Squat Day", focus: "Back Squat — Strength & Technique", isRestDay: false, keys: ["squat", "pauseSquat", "frontSquat", "legCurl", "plank"] },
+  tuesday: { label: "Bench Day", focus: "Bench Press — Off the Chest Power", isRestDay: false, keys: ["bench", "pauseBench", "cgBench", "tricepDip", "facePull"] },
+  wednesday: { label: "Rest & Recovery", focus: "Active Mobility", isRestDay: false, keys: ["mobility"] },
+  thursday: { label: "Deadlift Day", focus: "Conventional & Sumo Deadlift", isRestDay: false, keys: ["deadlift", "sumoDeadlift", "blockPull", "goodMorning", "bentOverRow"] },
+  friday: { label: "Accessory Day", focus: "Weak Point & GPP Training", isRestDay: false, keys: ["beltSquat", "rdl", "latPulldown", "cgBench", "farmerCarry"] },
+  saturday: { label: "Rest Day", focus: "Full Recovery", isRestDay: true, keys: [] },
+  sunday: { label: "Rest Day", focus: "Full Recovery", isRestDay: true, keys: [] },
+};
+
 const TEMPLATES: Record<ExperienceLevel, SplitTemplate> = {
   beginner: BEGINNER_TEMPLATE,
   intermediate: INTERMEDIATE_TEMPLATE,
@@ -366,24 +465,39 @@ export const DAY_ORDER: Day[] = ["monday", "tuesday", "wednesday", "thursday", "
  *  3. A cardio finisher on lifting days when the goal is cutting
  */
 export function generateWorkoutSplit(experience: ExperienceLevel, goal: Goal): WorkoutSplit {
-  const template = TEMPLATES[experience];
+  // Powerlifting uses its own dedicated template regardless of experience level
+  const template = goal === "powerlifting" ? POWERLIFTING_TEMPLATE : TEMPLATES[experience];
   const prescription = PRESCRIPTION_MATRIX[experience][goal];
 
   const split = {} as WorkoutSplit;
+
+  // Keys that always use fixed light/mobility prescriptions
+  const LIGHT_KEYS = ["mobility", "inclineWalk", "jumpRope", "bikeSprint", "farmerCarry"];
+  // Powerlifting accessory keys use slightly lighter volume than the main lifts
+  const PL_ACCESSORY_KEYS = ["pauseSquat", "frontSquat", "pauseBench", "cgBench", "beltSquat", "blockPull", "goodMorning", "sumoDeadlift", "bentOverRow", "tricepDip"];
 
   for (const day of DAY_ORDER) {
     const dayTemplate = template[day];
     const exercises: Exercise[] = dayTemplate.isRestDay
       ? []
       : dayTemplate.keys.map((key) => {
-          // Cardio / mobility keys keep lighter, fixed prescriptions rather than the heavy lifting matrix.
-          if (["mobility", "inclineWalk", "jumpRope", "bikeSprint", "farmerCarry"].includes(key)) {
+          if (LIGHT_KEYS.includes(key)) {
             return buildExercise(key, { sets: 3, reps: "10-12 min", intensity: "Moderate", restSeconds: 45 });
+          }
+          // Powerlifting accessories: 1 set fewer, slightly higher reps for hypertrophy support
+          if (goal === "powerlifting" && PL_ACCESSORY_KEYS.includes(key)) {
+            return buildExercise(key, {
+              sets: Math.max(3, prescription.sets - 1),
+              reps: "6-8",
+              intensity: "High",
+              restSeconds: 120,
+            });
           }
           return buildExercise(key, prescription);
         });
 
-    if (!dayTemplate.isRestDay && dayTemplate.label !== "Cardio & Core" && dayTemplate.label !== "Conditioning") {
+    // No cardio finisher for powerlifting — recovery is paramount
+    if (goal !== "powerlifting" && !dayTemplate.isRestDay && dayTemplate.label !== "Cardio & Core" && dayTemplate.label !== "Conditioning") {
       exercises.push(...cardioFinisher(goal));
     }
 

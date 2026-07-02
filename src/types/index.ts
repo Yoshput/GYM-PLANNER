@@ -1,5 +1,5 @@
 export type Gender = "male" | "female";
-export type Goal = "cutting" | "bulking" | "maintenance";
+export type Goal = "cutting" | "bulking" | "maintenance" | "powerlifting";
 export type ExperienceLevel = "beginner" | "intermediate" | "expert";
 export type Day =
   | "monday"
