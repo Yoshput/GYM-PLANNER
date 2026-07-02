@@ -54,66 +54,6 @@ function MacroBar({ pct, loggedPct, color, isOver }: { pct: number; loggedPct: n
   );
 }
 
-// ── Floating Dropdown rendered at fixed position to avoid stacking context issues ──
-function FoodDropdown({
-  results,
-  anchorRef,
-  visible,
-  onSelect,
-  onCustom,
-  query,
-}: {
-  results: any[];
-  anchorRef: React.RefObject<HTMLInputElement | null>;
-  visible: boolean;
-  onSelect: (food: any) => void;
-  onCustom: () => void;
-  query: string;
-}) {
-  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
-
-  useEffect(() => {
-    if (!visible || !anchorRef.current) return;
-    const rect = anchorRef.current.getBoundingClientRect();
-    setPos({ top: rect.bottom + 6, left: rect.left, width: rect.width });
-  }, [visible, query, anchorRef]);
-
-  if (!visible) return null;
-
-  return (
-    <div
-      style={{ position: "fixed", top: pos.top, left: pos.left, width: pos.width, zIndex: 9999 }}
-      className="bg-[#111] border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] max-h-56 overflow-y-auto scrollbar-none divide-y divide-white/5 animate-scale-in"
-    >
-      {results.length > 0 ? (
-        results.map((food, idx) => (
-          <button
-            key={idx}
-            onMouseDown={(e) => { e.preventDefault(); onSelect(food); }}
-            className="w-full text-left p-3.5 hover:bg-lime/5 transition-colors flex justify-between items-center text-xs"
-          >
-            <div>
-              <p className="font-bold text-white/90">{food.name}</p>
-              <p className="text-white/40 text-[10px] mt-0.5">P {food.proteinG}g · C {food.carbsG}g · F {food.fatG}g (per {food.baseGram}g)</p>
-            </div>
-            <span className="font-display font-black text-lime shrink-0 ml-2">{food.kcal} kcal</span>
-          </button>
-        ))
-      ) : (
-        <div className="p-4 text-center">
-          <p className="text-white/35 text-xs mb-2">Tidak ditemukan di database lokal.</p>
-          <button
-            onMouseDown={(e) => { e.preventDefault(); onCustom(); }}
-            className="text-[10px] font-bold uppercase tracking-wider text-lime bg-lime/10 px-3 py-1.5 rounded-lg border border-lime/20"
-          >
-            + Input Manual / Custom
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function NutritionPage() {
   return (
     <AppShell>
@@ -151,6 +91,7 @@ function NutritionContent() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchFocused, setSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Modals
   const [activePortionFood, setActivePortionFood] = useState<any | null>(null);
@@ -176,6 +117,17 @@ function NutritionContent() {
     const q = searchQuery.toLowerCase();
     setSearchResults(FOOD_DATABASE.filter(f => f.name.toLowerCase().includes(q)));
   }, [searchQuery]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleOpenPortionModal = (food: any) => {
     setActivePortionFood(food);
@@ -380,33 +332,51 @@ function NutritionContent() {
         </div>
       </div>
 
-      {/* ── Food Search ── */}
-      <div className="mb-5 animate-stagger-in">
-        <div className="bg-base-raised/30 border border-base-border/70 rounded-2xl p-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-3 flex items-center gap-1.5">
-            <Search size={14} className="text-lime" /> Cari & Log Makanan
-          </p>
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Cari nasi putih, dada ayam, tempe..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-            className="w-full bg-black/40 border border-base-border/75 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 transition-colors placeholder-white/20"
-          />
-        </div>
-
-        {/* Fixed-position floating dropdown — bypasses glass-card stacking context */}
-        <FoodDropdown
-          results={searchResults}
-          anchorRef={searchInputRef}
-          visible={searchFocused && searchQuery.length > 0}
-          onSelect={handleOpenPortionModal}
-          onCustom={() => { setCustomFoodName(searchQuery); setSearchQuery(""); setShowCustomForm(true); }}
-          query={searchQuery}
+      {/* ── Food Search (No overlay/containment issues because of clean markup structure) ── */}
+      <div className="bg-base-raised/30 border border-base-border/70 rounded-2xl p-4 mb-5 animate-stagger-in relative" ref={searchContainerRef}>
+        <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-3 flex items-center gap-1.5">
+          <Search size={14} className="text-lime" /> Cari & Log Makanan
+        </p>
+        <input
+          ref={searchInputRef}
+          type="text"
+          placeholder="Cari nasi putih, dada ayam, tempe..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onFocus={() => setSearchFocused(true)}
+          className="w-full bg-black/40 border border-base-border/75 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 transition-colors placeholder-white/20"
         />
+        
+        {/* Dropdown Hasil Pencarian - nempel di container relative, 100% responsif & aman di HP */}
+        {searchFocused && searchQuery.trim().length > 0 && (
+          <div className="absolute left-4 right-4 top-[84px] z-50 bg-[#111] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] max-h-56 overflow-y-auto scrollbar-none divide-y divide-white/5 animate-scale-in">
+            {searchResults.length > 0 ? (
+              searchResults.map((food, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleOpenPortionModal(food)}
+                  className="w-full text-left p-3.5 hover:bg-lime/5 transition-colors flex justify-between items-center text-xs"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-white/90 truncate">{food.name}</p>
+                    <p className="text-white/40 text-[10px] mt-0.5">P {food.proteinG}g · C {food.carbsG}g · F {food.fatG}g (per {food.baseGram}g)</p>
+                  </div>
+                  <span className="font-display font-black text-lime shrink-0 ml-2">{food.kcal} kcal +</span>
+                </button>
+              ))
+            ) : (
+              <div className="p-4 text-center">
+                <p className="text-white/35 text-xs mb-2">Tidak ditemukan di database lokal.</p>
+                <button
+                  onClick={() => { setCustomFoodName(searchQuery); setSearchQuery(""); setShowCustomForm(true); }}
+                  className="text-[10px] font-bold uppercase tracking-wider text-lime bg-lime/10 px-3 py-1.5 rounded-lg border border-lime/20"
+                >
+                  + Input Manual / Custom
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Water Tracker ── */}

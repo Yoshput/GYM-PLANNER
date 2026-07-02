@@ -66,7 +66,7 @@ Selalu balas HANYA JSON.`,
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -102,7 +102,7 @@ Selalu balas HANYA JSON.`,
   } catch (error: any) {
     console.error("Nutrition scan error:", error);
     return NextResponse.json(
-      { error: "Gagal memproses. Pastikan API Key benar dan coba lagi." },
+      { error: `Gagal memproses: ${error.message || "Terjadi kesalahan internal."}` },
       { status: 500 }
     );
   }
