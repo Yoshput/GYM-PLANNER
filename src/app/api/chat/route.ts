@@ -54,20 +54,11 @@ export async function POST(request: Request) {
       parts: [{ text: m.content }],
     }));
 
-    // Detect API key format: AQ./ya29. = OAuth Bearer token, AIzaSy = standard API key
-    const isOAuthToken = apiKey.startsWith("AQ.") || apiKey.startsWith("ya29.");
-    const authHeaders: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...(isOAuthToken
-        ? { "Authorization": `Bearer ${apiKey}` }
-        : { "x-goog-api-key": apiKey }),
-    };
-
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
-        headers: authHeaders,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction,
           contents,
