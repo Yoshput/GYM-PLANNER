@@ -48,10 +48,14 @@ export async function POST(request: Request) {
     });
 
     // Build chat history (all messages except the last one)
-    const history = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
+    // Gemini SDK requires history to start with role "user" — filter out leading model messages
+    const rawHistory = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }],
     }));
+    // Drop messages from the start until we hit the first "user" message
+    const firstUserIdx = rawHistory.findIndex((m: { role: string }) => m.role === "user");
+    const history = firstUserIdx >= 0 ? rawHistory.slice(firstUserIdx) : [];
 
     const lastMessage = messages[messages.length - 1];
 
