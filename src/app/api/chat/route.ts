@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     }));
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,9 +67,13 @@ export async function POST(request: Request) {
     );
 
     if (!response.ok) {
-      const errData = await response.json();
+      let errorMsg = "Gagal menghubungi Gemini API";
+      try {
+        const errData = await response.json();
+        errorMsg = errData.error?.message || JSON.stringify(errData);
+      } catch (e) {}
       return NextResponse.json(
-        { error: "Gagal menghubungi Gemini API", details: errData },
+        { error: `Gemini API Error: ${errorMsg}` },
         { status: response.status }
       );
     }
