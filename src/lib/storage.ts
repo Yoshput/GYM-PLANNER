@@ -3,6 +3,7 @@ import { UserProfile, WorkoutLogEntry } from "@/types";
 const KEYS = {
   profile: "gym-planner:profile",
   logs: "gym-planner:logs",
+  split: "gym-planner:custom-split",
 } as const;
 
 function isBrowser() {
@@ -29,6 +30,23 @@ export function clearProfile(): void {
   if (!isBrowser()) return;
   window.localStorage.removeItem(KEYS.profile);
   window.localStorage.removeItem(KEYS.logs);
+  window.localStorage.removeItem(KEYS.split);
+}
+
+export function getCustomSplit(): any | null {
+  if (!isBrowser()) return null;
+  const raw = window.localStorage.getItem(KEYS.split);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function saveCustomSplit(split: any): void {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(KEYS.split, JSON.stringify(split));
 }
 
 export function getLogs(): WorkoutLogEntry[] {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Clock, Repeat, Layers, Zap, Check, Trophy, Play, Pause, RotateCcw, SkipForward, Flame, TrendingUp } from "lucide-react";
+import { X, Clock, Repeat, Layers, Zap, Check, Trophy, Play, Pause, RotateCcw, SkipForward, Flame, TrendingUp, AlertTriangle } from "lucide-react";
 import { Exercise } from "@/types";
 import { addLogEntry, isExerciseCompletedToday, getLogs } from "@/lib/storage";
 import { useToast } from "@/components/ui/Toast";
@@ -100,10 +100,12 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
   // Rest Timer State
   const [timeLeft, setTimeLeft] = useState(exercise.restSeconds);
   const [timerActive, setTimerActive] = useState(false);
+  const [isOverRest, setIsOverRest] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const overRestIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sound generator using Web Audio API
-  const playBeep = () => {
+  const playBeep = (freq = 880) => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
@@ -112,7 +114,7 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
       const gain = ctx.createGain();
       
       osc.type = "sine";
-      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
       gain.gain.setValueAtTime(0.1, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
       
@@ -141,7 +143,8 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
       }, 1000);
     } else if (timeLeft === 0 && timerActive) {
       setTimerActive(false);
-      playBeep();
+      setIsOverRest(true);
+      playBeep(880);
       triggerVibrate();
       showToast("Waktu Istirahat Selesai! 🔔", {
         sub: "Kembali ke set berikutnya!",
@@ -154,7 +157,27 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
     };
   }, [timerActive, timeLeft]);
 
+  // Over-Rest Repetitive Vibrator Alarm
+  useEffect(() => {
+    if (isOverRest) {
+      overRestIntervalRef.current = setInterval(() => {
+        playBeep(920); // slightly sharper alert sound
+        triggerVibrate();
+      }, 20000); // remind every 20 seconds
+    } else {
+      if (overRestIntervalRef.current) {
+        clearInterval(overRestIntervalRef.current);
+        overRestIntervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (overRestIntervalRef.current) clearInterval(overRestIntervalRef.current);
+    };
+  }, [isOverRest]);
+
   const startTimer = (seconds = exercise.restSeconds) => {
+    setIsOverRest(false); // clear active alert warnings
     setTimeLeft(seconds);
     setTimerActive(true);
   };
@@ -164,6 +187,9 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
     const targetState = !updated[index].completed;
     updated[index].completed = targetState;
     setSetsData(updated);
+
+    // Stop alert warning when any checkbox is clicked
+    setIsOverRest(false);
 
     // Auto-trigger rest timer when a set is marked complete
     if (targetState) {
@@ -215,86 +241,73 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
 
     setJustCompleted(true);
     setCompleted(true);
+    setIsOverRest(false);
     
     showToast(`${exercise.name} Selesai! 🏆`, {
       sub: `${completedSetsCount || exercise.sets} set telah dicatat`,
       variant: "success",
     });
-
-    setTimeout(() => onClose(), 1500);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/85 backdrop-blur-sm animate-fade-in"
-        onClick={onClose}
-        aria-hidden="true"
+      <div 
+        className="absolute inset-0 bg-black/85 backdrop-blur-md animate-fade-in" 
+        onClick={() => {
+          setIsOverRest(false);
+          onClose();
+        }} 
       />
 
-      <div
-        role="dialog"
-        aria-modal="true"
-        className="relative w-full sm:max-w-md sm:mx-4 bg-base-card border border-base-border/80 rounded-t-[2rem] sm:rounded-[2rem] max-h-[90vh] overflow-y-auto scrollbar-none animate-slide-up sm:animate-scale-in shadow-[0_-20px_60px_rgba(0,0,0,0.6)]"
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          aria-label="Close exercise details"
-          className="absolute top-5 right-5 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-base-border text-white/60 active:scale-90 transition-transform hover:text-white hover:border-white/25"
-        >
-          <X size={18} />
-        </button>
-
-        {/* Hero area */}
-        <div className={`relative h-44 bg-gradient-to-br from-base-raised via-base-card to-base overflow-hidden flex items-center justify-center rounded-t-[2rem] ${INTENSITY_GLOW[exercise.intensity]}`}>
-          {exercise.imageUrl && (
-            <img
-              src={exercise.imageUrl}
-              alt={exercise.name}
-              className="absolute inset-0 w-full h-full object-cover opacity-50"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-base-card/20 to-base-card" />
-          <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-lime/8 blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-ember/8 blur-3xl" />
-
-          {justCompleted ? (
-            <div className="relative z-10 flex flex-col items-center gap-2 animate-bounce-in">
-              <div className="h-16 w-16 rounded-full bg-lime/20 border-2 border-lime/40 flex items-center justify-center">
-                <Trophy size={32} className="text-lime" />
-              </div>
-              <p className="font-display font-extrabold text-lime uppercase tracking-widest text-xs">Selesai!</p>
-            </div>
-          ) : (
-            !exercise.imageUrl && <TechniquePlaceholder />
-          )}
-
-          <span className="absolute bottom-3 left-5 chip bg-black/55 text-lime border border-lime/25 backdrop-blur-sm text-[10px] font-bold">
-            {exercise.imageUrl ? "Preview Gerakan" : "Panduan Teknik"}
-          </span>
+      {/* Modal Container */}
+      <div className="relative w-full sm:max-w-lg bg-base-card border border-base-border rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[94vh] overflow-hidden animate-slide-up sm:animate-scale-in">
+        
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-base-border/50 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className={`chip text-[10px] font-extrabold uppercase py-0.5 px-2.5 rounded-md ${INTENSITY_COLOR[exercise.intensity]} ${INTENSITY_GLOW[exercise.intensity]}`}>
+              {exercise.intensity}
+            </span>
+            <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider">{exercise.equipment}</span>
+          </div>
+          <button 
+            onClick={() => {
+              setIsOverRest(false);
+              onClose();
+            }} 
+            className="h-10 w-10 flex items-center justify-center rounded-full bg-base-raised/80 text-white/50 hover:text-white hover:bg-base-raised transition-all"
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`chip ${INTENSITY_COLOR[exercise.intensity]}`}>
-              Intensitas {exercise.intensity}
-            </span>
+        {/* Content Body */}
+        <div className="p-6 overflow-y-auto scrollbar-none flex-1">
+          {/* Muscle and Exercise info */}
+          <div className="mb-5">
+            <h2 className="heading-brutal text-2xl uppercase tracking-tight text-white">{exercise.name}</h2>
+            <p className="text-lime text-xs font-bold uppercase tracking-wider mt-1">{exercise.targetMuscle}</p>
           </div>
 
-          <h2 className="heading-brutal text-2xl mb-1">{exercise.name}</h2>
-          <p className="text-white/50 text-sm mb-4">{exercise.targetMuscle}</p>
+          {/* Cue Teknik */}
+          <div className="bg-lime/5 border border-lime/20 rounded-2xl p-4 mb-5">
+            <p className="text-[9px] font-extrabold text-lime uppercase tracking-widest mb-1">CUE TEKNIK YOSFIT</p>
+            <p className="text-white/70 text-xs leading-relaxed">{exercise.cue}</p>
+          </div>
 
-          {/* Progressive Overload Recommendation Indicator (Hidden in Simple Mode) */}
-          {!isSimpleMode && (
-            <div className="glass-card p-4.5 mb-5 border-lime/15 bg-lime/3 flex items-start gap-3">
-              <TrendingUp size={18} className="text-lime shrink-0 mt-0.5" />
+          {/* Overload Tip (Hidden in Simple Mode) */}
+          {previousPerformance && !completed && !isSimpleMode && (
+            <div className="bg-white/3 border border-white/5 rounded-2xl p-4 mb-5 flex items-start gap-3">
+              <div className="h-7 w-7 rounded-lg bg-ember/15 text-ember flex items-center justify-center shrink-0">
+                <TrendingUp size={14} />
+              </div>
               <div>
-                <p className="text-xs font-bold text-lime uppercase tracking-wider leading-none mb-1">Rekomendasi Hari Ini</p>
-                <p className="font-display font-black text-sm text-white">{recommendation.weight}kg x {recommendation.reps} reps</p>
-                <p className="text-[10px] text-white/40 mt-1 leading-normal">{recommendation.reason}</p>
+                <p className="text-[9px] font-extrabold text-white/40 uppercase tracking-widest">Target Progres Hari Ini</p>
+                <p className="text-white/80 text-xs mt-0.5 leading-relaxed">
+                  Latihan lalu: <strong className="text-white">{previousPerformance.weight}kg</strong> &middot; {previousPerformance.sets} set.
+                </p>
+                <p className="text-lime text-[11px] font-bold mt-1">Saran: Angkat {recommendation.weight}kg sebanyak {recommendation.reps} reps.</p>
               </div>
             </div>
           )}
@@ -310,21 +323,34 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
             </button>
           )}
 
+          {/* Over-Rest Loud Alert Warn Banner */}
+          {isOverRest && (
+            <div className="bg-ember/15 border-2 border-ember rounded-2xl p-3.5 mb-4 text-center animate-pulse flex items-center justify-center gap-2">
+              <AlertTriangle size={15} className="text-ember" />
+              <p className="text-xs font-black text-white uppercase tracking-wider">
+                Istirahat Selesai! Mulai Set Berikutnya Sekarang!
+              </p>
+              <AlertTriangle size={15} className="text-ember" />
+            </div>
+          )}
+
           {/* Interactive Rest Timer Section */}
           <div className={`glass-card p-4 mb-5 transition-all duration-300 border ${
-            timerActive && timeLeft <= 10 
+            isOverRest 
+              ? "border-ember bg-ember/10 shadow-[0_0_20px_rgba(255,69,0,0.25)]"
+              : timerActive && timeLeft <= 10 
               ? "border-ember/45 bg-ember/10 animate-pulse shadow-[0_0_15px_rgba(255,69,0,0.15)]" 
               : "border-lime/10"
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock size={16} className={timerActive && timeLeft <= 10 ? "text-ember" : "text-lime"} />
+                <Clock size={16} className={isOverRest || (timerActive && timeLeft <= 10) ? "text-ember" : "text-lime"} />
                 <span className="text-xs font-bold uppercase tracking-wider text-white/50">
-                  {timerActive ? "Waktu Istirahat" : "Target Istirahat"}
+                  {isOverRest ? "OVER-RESTING" : timerActive ? "Waktu Istirahat" : "Target Istirahat"}
                 </span>
               </div>
               <span className={`font-mono font-extrabold text-xl ${
-                timerActive && timeLeft <= 10 ? "text-ember" : "text-lime"
+                isOverRest || (timerActive && timeLeft <= 10) ? "text-ember" : "text-lime"
               }`}>
                 {timeLeft}s
               </span>
@@ -332,14 +358,20 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
 
             <div className="flex items-center justify-end gap-2 mt-3">
               <button
-                onClick={() => setTimerActive(!timerActive)}
+                onClick={() => {
+                  setIsOverRest(false);
+                  setTimerActive(!timerActive);
+                }}
                 className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 active:scale-95 text-white/80"
                 title={timerActive ? "Pause" : "Play"}
               >
                 {timerActive ? <Pause size={14} /> : <Play size={14} />}
               </button>
               <button
-                onClick={() => setTimeLeft(exercise.restSeconds)}
+                onClick={() => {
+                  setIsOverRest(false);
+                  setTimeLeft(exercise.restSeconds);
+                }}
                 className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 active:scale-95 text-white/80"
                 title="Reset"
               >
@@ -348,6 +380,7 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
               <button
                 onClick={() => {
                   setTimerActive(false);
+                  setIsOverRest(false);
                   setTimeLeft(0);
                 }}
                 className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 active:scale-95 text-white/80"
@@ -457,69 +490,34 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
               ))}
             </div>
           </div>
-
-          {/* Technique cue */}
-          <div className="glass-card p-4 mb-6 border-lime/10">
-            <div className="flex items-center gap-2 text-lime text-xs font-bold uppercase tracking-wide mb-2">
-              <Zap size={14} />
-              Tips Teknik
-            </div>
-            <p className="text-white/70 text-sm leading-relaxed">{exercise.cue}</p>
-          </div>
-
-          {/* Equipment info */}
-          <div className="flex items-center justify-between mb-6 text-sm px-1">
-            <span className="text-white/40">Peralatan</span>
-            <span className="text-white/80 font-semibold">{exercise.equipment}</span>
-          </div>
-
-          {/* CTA Button */}
-          {completed ? (
-            <div className="w-full flex items-center justify-center gap-2 rounded-full py-4 min-h-[52px] bg-lime/10 border border-lime/30 text-lime font-display font-bold uppercase tracking-wide text-sm animate-bounce-in">
-              <Check size={18} />
-              Tercatat Hari Ini
-            </div>
-          ) : (
-            <button
-              onClick={handleMarkComplete}
-              className="btn-primary w-full animate-glow-pulse-lime text-sm py-4"
-            >
-              Catat Latihan Selesai
-            </button>
-          )}
         </div>
+
+        {/* Footer Actions */}
+        <div className="px-6 py-5 border-t border-base-border/50 bg-base-card/95 flex gap-3">
+          <button 
+            onClick={() => {
+              setIsOverRest(false);
+              onClose();
+            }} 
+            className="btn-secondary flex-1"
+          >
+            Tutup
+          </button>
+          
+          <button
+            onClick={handleMarkComplete}
+            disabled={completed}
+            className={`btn-primary flex-[2] ${completed ? "bg-lime/20 border-lime/10 text-lime/50 cursor-default" : "animate-glow-pulse-lime"}`}
+          >
+            {completed ? (
+              <span className="flex items-center gap-1.5 justify-center"><Check size={16} /> Latihan Selesai</span>
+            ) : (
+              <span className="flex items-center gap-1.5 justify-center"><Trophy size={15} /> Selesaikan Latihan</span>
+            )}
+          </button>
+        </div>
+
       </div>
     </div>
-  );
-}
-
-function TechniquePlaceholder() {
-  return (
-    <svg viewBox="0 0 200 140" className="h-32 w-32" aria-hidden="true">
-      <circle cx="100" cy="70" r="55" fill="none" stroke="#CCFF00" strokeOpacity="0.08" strokeWidth="1.5" />
-      <circle cx="100" cy="70" r="40" fill="none" stroke="#CCFF00" strokeOpacity="0.18" strokeWidth="1.5">
-        <animate attributeName="r" values="40;47;40" dur="3s" repeatCount="indefinite" />
-        <animate attributeName="stroke-opacity" values="0.18;0.04;0.18" dur="3s" repeatCount="indefinite" />
-      </circle>
-      <g stroke="#CCFF00" strokeWidth="5" strokeLinecap="round">
-        <line x1="72" y1="70" x2="128" y2="70">
-          <animateTransform
-            attributeName="transform"
-            type="rotate"
-            values="-10 100 70; 10 100 70; -10 100 70"
-            dur="2s"
-            repeatCount="indefinite"
-          />
-        </line>
-      </g>
-      <g fill="#FF4500">
-        <rect x="58" y="54" width="14" height="32" rx="4">
-          <animateTransform attributeName="transform" type="rotate" values="-10 100 70; 10 100 70; -10 100 70" dur="2s" repeatCount="indefinite" />
-        </rect>
-        <rect x="128" y="54" width="14" height="32" rx="4">
-          <animateTransform attributeName="transform" type="rotate" values="-10 100 70; 10 100 70; -10 100 70" dur="2s" repeatCount="indefinite" />
-        </rect>
-      </g>
-    </svg>
   );
 }
