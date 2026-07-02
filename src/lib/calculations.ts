@@ -32,18 +32,21 @@ const GOAL_CALORIE_ADJUSTMENT: Record<Goal, number> = {
   cutting: -0.2, // 20% deficit
   bulking: 0.15, // 15% surplus
   maintenance: 0,
+  powerlifting: 0.10, // 10% surplus for strength & performance
 };
 
 const GOAL_PROTEIN_PER_KG: Record<Goal, number> = {
   cutting: 2.2, // higher protein to preserve lean mass in a deficit
   bulking: 1.8,
   maintenance: 2.0,
+  powerlifting: 2.0, // balanced high protein for recovery
 };
 
 const GOAL_FAT_PCT_OF_CALORIES: Record<Goal, number> = {
   cutting: 0.25,
   bulking: 0.25,
   maintenance: 0.28,
+  powerlifting: 0.25,
 };
 
 export function calculateMacros(profile: UserProfile): MacroTargets {

@@ -45,6 +45,7 @@ const GOAL_META: Record<Goal, { label: string; icon: React.ReactNode }> = {
   cutting: { label: "Cutting", icon: <Minus size={14} /> },
   bulking: { label: "Bulking", icon: <TrendingUp size={14} /> },
   maintenance: { label: "Maintenance", icon: <Flame size={14} /> },
+  powerlifting: { label: "Powerlifting", icon: <Dumbbell size={14} /> },
 };
 
 const LEVEL_META: Record<ExperienceLevel, { label: string; icon: React.ReactNode }> = {
