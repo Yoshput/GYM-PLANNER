@@ -65,11 +65,22 @@ Selalu balas HANYA JSON.`,
       return NextResponse.json({ error: "Butuh query atau gambar." }, { status: 400 });
     }
 
+    // Format endpoint & headers based on key style (OAuth vs Standard API Key)
+    const isOAuth = apiKey.startsWith("AQ.") || apiKey.startsWith("ya29.");
+    const url = isOAuth
+      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
+      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(isOAuth ? { "Authorization": `Bearer ${apiKey}` } : {}),
+    };
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`,
+      url,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           contents: [{ role: "user", parts }],
           generationConfig: {
