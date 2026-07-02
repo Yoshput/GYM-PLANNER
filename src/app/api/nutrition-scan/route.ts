@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(request: Request) {
   try {
     const { query, imageBase64, mimeType, userApiKey } = await request.json();
 
-    const apiKey = process.env.GEMINI_API_KEY || userApiKey;
+    const apiKey = (process.env.GEMINI_API_KEY || userApiKey || "").trim();
 
     if (!apiKey) {
       return NextResponse.json(
@@ -12,8 +13,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    let parts: any[] = [];
 
     const jsonInstruction = `Berikan respons HANYA dalam format JSON berikut tanpa markdown, tanpa backticks, tanpa kode blok apapun — hanya JSON murni:
 {
@@ -28,79 +27,33 @@ export async function POST(request: Request) {
   "notes": "Catatan singkat tentang estimasi akurasi"
 }`;
 
+    // Use official Google Generative AI SDK — handles AQ. and AIzaSy keys automatically
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    let prompt: string;
+    let imagePart: any = null;
+
     if (imageBase64) {
-      // Multimodal: Image + Text prompt
-      parts.push({
-        inline_data: {
-          mime_type: mimeType || "image/jpeg",
+      imagePart = {
+        inlineData: {
+          mimeType: mimeType || "image/jpeg",
           data: imageBase64,
         },
-      });
-      parts.push({
-        text: `Kamu adalah ahli nutrisi dan dietitian profesional. Identifikasi semua makanan yang terlihat dalam foto ini, lalu perkirakan total kandungan nutrisi untuk sajian yang terlihat di foto (bukan per 100g, tapi total estimasi porsi dalam foto).
-
-${jsonInstruction}
-
-Jika tidak bisa mengidentifikasi dengan baik, tetap berikan estimasi terbaik dan set confidence ke "low". Selalu balas HANYA JSON.`,
-      });
+      };
+      prompt = `Kamu adalah ahli nutrisi dan dietitian profesional. Identifikasi semua makanan yang terlihat dalam foto ini, lalu perkirakan total kandungan nutrisi untuk sajian yang terlihat di foto (bukan per 100g, tapi total estimasi porsi dalam foto).\n\n${jsonInstruction}\n\nJika tidak bisa mengidentifikasi dengan baik, tetap berikan estimasi terbaik dan set confidence ke "low". Selalu balas HANYA JSON.`;
     } else if (query) {
-      // Text-based: parse food name + gram from user query
-      parts.push({
-        text: `Kamu adalah ahli nutrisi dan dietitian profesional. User ingin mengetahui kandungan nutrisi makanan berikut:
-
-"${query}"
-
-Tugas kamu:
-1. Identifikasi nama makanan dari query tersebut
-2. Jika user menyebutkan gram spesifik (misalnya "150g", "50 gram", "200g"), hitung nutrisi untuk gram tersebut
-3. Jika tidak ada gram, default ke 100g
-4. Hitung protein, karbohidrat, lemak, serat, dan kalori berdasarkan database nutrisi yang akurat untuk makanan Indonesia atau internasional
-
-${jsonInstruction}
-
-Contoh: jika user ketik "Ayam rebus 150 gram", maka estimatedGram: 150 dan semua nutrisi dihitung untuk 150g dada ayam rebus.
-Selalu balas HANYA JSON.`,
-      });
+      prompt = `Kamu adalah ahli nutrisi dan dietitian profesional. User ingin mengetahui kandungan nutrisi makanan berikut:\n\n"${query}"\n\nTugas kamu:\n1. Identifikasi nama makanan dari query tersebut\n2. Jika user menyebutkan gram spesifik (misalnya "150g", "50 gram", "200g"), hitung nutrisi untuk gram tersebut\n3. Jika tidak ada gram, default ke 100g\n4. Hitung protein, karbohidrat, lemak, serat, dan kalori berdasarkan database nutrisi yang akurat untuk makanan Indonesia atau internasional\n\n${jsonInstruction}\n\nContoh: jika user ketik "Ayam rebus 150 gram", maka estimatedGram: 150 dan semua nutrisi dihitung untuk 150g dada ayam rebus.\nSelalu balas HANYA JSON.`;
     } else {
       return NextResponse.json({ error: "Butuh query atau gambar." }, { status: 400 });
     }
 
-    const cleanApiKey = apiKey.trim();
-    const isOAuth = cleanApiKey.startsWith("AQ.") || cleanApiKey.startsWith("ya29.");
-    const url = isOAuth
-      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
-      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanApiKey}`;
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...(isOAuth ? { "Authorization": `Bearer ${cleanApiKey}` } : {}),
-    };
+    const result = imagePart
+      ? await model.generateContent([prompt, imagePart])
+      : await model.generateContent(prompt);
 
-    const response = await fetch(
-      url,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          contents: [{ role: "user", parts }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 512,
-          },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errData = await response.json();
-      return NextResponse.json(
-        { error: `Gemini API Error: ${errData?.error?.message || response.statusText}` },
-        { status: 500 }
-      );
-    }
-
-    const data = await response.json();
-    const rawText: string = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const rawText = result.response.text() || "";
 
     // Clean all possible markdown wrappers before parsing
     const cleanedText = rawText

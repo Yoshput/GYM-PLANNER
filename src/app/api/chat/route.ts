@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(request: Request) {
   try {
     const { messages, userApiKey, userContext } = await request.json();
 
     // Prioritize environment variable, fallback to client-supplied key
-    const apiKey = process.env.GEMINI_API_KEY || userApiKey;
+    const apiKey = (process.env.GEMINI_API_KEY || userApiKey || "").trim();
 
     if (!apiKey) {
       return NextResponse.json(
@@ -39,63 +40,30 @@ export async function POST(request: Request) {
       }
     }
 
-    const systemInstruction = {
-      parts: [
-        {
-          text: contextPrompt,
-        },
-      ],
-    };
+    // Use official Google Generative AI SDK — handles AQ. and AIzaSy keys automatically
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: contextPrompt,
+    });
 
-    // Format messages history for Gemini API content structure
-    // Convert role 'assistant' to 'model' for Gemini spec
-    const contents = messages.map((m: { role: string; content: string }) => ({
+    // Build chat history (all messages except the last one)
+    const history = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }],
     }));
 
-    const cleanApiKey = apiKey.trim();
-    const isOAuth = cleanApiKey.startsWith("AQ.") || cleanApiKey.startsWith("ya29.");
-    const url = isOAuth
-      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
-      : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanApiKey}`;
+    const lastMessage = messages[messages.length - 1];
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...(isOAuth ? { "Authorization": `Bearer ${cleanApiKey}` } : {}),
-    };
-
-    const response = await fetch(
-      url,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          systemInstruction,
-          contents,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      let errorMsg = "Gagal menghubungi Gemini API";
-      try {
-        const errData = await response.json();
-        errorMsg = errData.error?.message || JSON.stringify(errData);
-      } catch (e) {}
-      return NextResponse.json(
-        { error: `Gemini API Error: ${errorMsg}` },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, YosBot sedang mengalami kendala menjawab pertanyaan Anda.";
+    const chat = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage.content);
+    const replyText = result.response.text() || "Maaf, YosBot sedang mengalami kendala menjawab pertanyaan Anda.";
 
     return NextResponse.json({ reply: replyText });
   } catch (error: any) {
+    const errorMsg = error?.message || "Internal Server Error";
     return NextResponse.json(
-      { error: "Internal Server Error", message: error.message },
+      { error: `Gemini API Error: ${errorMsg}` },
       { status: 500 }
     );
   }
