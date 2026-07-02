@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Butuh query atau gambar." }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const result = imagePart
       ? await model.generateContent([prompt, imagePart])

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     // Use official Google Generative AI SDK — handles AQ. and AIzaSy keys automatically
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-lite",
+      model: "gemini-2.5-flash",
       systemInstruction: contextPrompt,
     });
 
