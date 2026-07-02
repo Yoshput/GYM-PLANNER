@@ -229,14 +229,61 @@ function NutritionContent() {
   const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setShowAIScanner(true);
+    setAiQuery("");
+    setAiLoading(true);
+    setAiError("");
+    setAiResult(null);
+
     const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const base64 = dataUrl.split(",")[1];
-      const mimeType = file.type;
-      setShowAIScanner(true);
-      setAiQuery("");
-      runAIScan(undefined, base64, mimeType);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas for image resizing and compression
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 1024;
+        const MAX_HEIGHT = 1024;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          setAiError("Gagal memproses canvas gambar.");
+          setAiLoading(false);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Export to low quality JPEG (70% compression)
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        const base64 = compressedDataUrl.split(",")[1];
+        
+        // Trigger Gemini API scan with lightweight compressed image
+        runAIScan(undefined, base64, "image/jpeg");
+      };
+      
+      img.onerror = () => {
+        setAiError("Gagal membaca file gambar.");
+        setAiLoading(false);
+      };
+      
+      img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
@@ -296,7 +343,7 @@ function NutritionContent() {
           {/* Camera Scan Button */}
           <label className="h-8 px-3 rounded-lg bg-base-raised/70 border border-base-border/55 flex items-center justify-center text-lime hover:bg-lime/10 cursor-pointer transition-all text-[10px] font-bold uppercase tracking-wider active:scale-95 gap-1">
             <Camera size={12} /> Scan
-            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCameraCapture} onClick={() => setShowAIScanner(true)} />
+            <input ref={cameraInputRef} type="file" accept="image/*" className="hidden" onChange={handleCameraCapture} onClick={() => setShowAIScanner(true)} />
           </label>
           {/* AI Scanner Button */}
           <button
@@ -600,7 +647,7 @@ function NutritionContent() {
 
                 <label className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-lime/30 rounded-2xl text-lime/80 hover:text-lime hover:bg-lime/5 cursor-pointer transition-all text-xs font-bold uppercase tracking-wider">
                   <Camera size={15} /> Foto Makanan Anda
-                  <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCameraCapture} />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleCameraCapture} />
                 </label>
                 <p className="text-center text-white/25 text-[9px] mt-2">AI akan langsung identifikasi & hitung nutrisinya</p>
               </>

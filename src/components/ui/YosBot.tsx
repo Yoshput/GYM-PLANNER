@@ -198,9 +198,40 @@ export default function YosBot() {
                       ? "bg-lime text-base border-lime shadow-md font-medium rounded-tr-none"
                       : "bg-base-raised/60 text-white/80 border-base-border rounded-tl-none"
                   }`}
-                  style={{ whiteSpace: "pre-line" }}
                 >
-                  {m.content}
+                  {m.role === "user" ? (
+                    <div style={{ whiteSpace: "pre-line" }}>{m.content}</div>
+                  ) : (
+                    <div className="space-y-1.5 text-left break-words">
+                      {m.content.split("\n").map((line, lineIdx) => {
+                        let trimmed = line.trim();
+                        
+                        // Parse bullet list items starting with '*' or '-'
+                        if (trimmed.startsWith("* ") || trimmed.startsWith("- ")) {
+                          const cleanText = trimmed.substring(2);
+                          return (
+                            <div key={lineIdx} className="flex items-start gap-2 pl-1.5 my-0.5">
+                              <span className="h-1.5 w-1.5 rounded-full bg-lime shrink-0 mt-1.5" />
+                              <span dangerouslySetInnerHTML={{
+                                __html: cleanText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                              }} />
+                            </div>
+                          );
+                        }
+
+                        // Normal paragraphs with bold parsing
+                        return (
+                          <p 
+                            key={lineIdx} 
+                            className={trimmed === "" ? "h-2" : ""}
+                            dangerouslySetInnerHTML={{
+                              __html: line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                            }} 
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
