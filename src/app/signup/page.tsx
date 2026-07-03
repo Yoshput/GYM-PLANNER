@@ -45,22 +45,46 @@ export default function SignupPage() {
         },
       });
 
+      // Debug: log full response
+      console.log("[Signup] data:", JSON.stringify(data));
+      console.log("[Signup] authError:", JSON.stringify(authError));
+
       if (authError) {
-        throw authError;
+        // Map Supabase error codes to Indonesian messages
+        const code = (authError as any)?.code || (authError as any)?.error_code || "";
+        const status = (authError as any)?.status;
+        if (code === "user_already_exists" || status === 422) {
+          throw new Error("Email ini sudah terdaftar. Silakan masuk atau gunakan email lain.");
+        } else if (code === "weak_password") {
+          throw new Error("Password terlalu lemah. Gunakan kombinasi huruf dan angka.");
+        } else if (code === "invalid_email") {
+          throw new Error("Format email tidak valid.");
+        } else if (authError.message) {
+          throw new Error(authError.message);
+        } else {
+          throw new Error("Gagal mendaftar. Silakan coba beberapa saat lagi.");
+        }
+      }
+
+      // If user already exists but email not confirmed, Supabase returns user with empty identities
+      if (data?.user && data.user.identities?.length === 0) {
+        setError("Email ini sudah terdaftar. Silakan masuk atau cek email konfirmasi Anda.");
+        setLoading(false);
+        return;
       }
 
       setSuccess(true);
-      // Wait a moment then redirect to login or show alert
       setTimeout(() => {
         router.push("/login");
       }, 3000);
     } catch (err: any) {
+      console.error("[Signup] catch err:", err);
       const msg =
-        typeof err?.message === "string" && err.message
+        typeof err?.message === "string" && err.message.trim() && err.message !== "{}"
           ? err.message
-          : typeof err === "string" && err
+          : typeof err === "string" && err.trim()
           ? err
-          : "Gagal mendaftar. Silakan coba kembali.";
+          : "Gagal mendaftar. Periksa koneksi internet dan coba kembali.";
       setError(msg);
     } finally {
       setLoading(false);
