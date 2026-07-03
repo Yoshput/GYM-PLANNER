@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { ExperienceLevel, Gender, Goal, UserProfile, ExperienceMode, GymEquipment, TrainingStyle } from "@/types";
 import { saveProfile } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 
 interface OnboardingModalProps {
   onClose: () => void;
@@ -96,11 +97,11 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
     setStep(step - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || !gender || !goal || !experience || !experienceMode || !equipment) return;
     setIsSubmitting(true);
 
-    const profile: UserProfile = {
+    const profileData: UserProfile = {
       name: name.trim(),
       gender,
       weightKg: Number(weightKg),
@@ -116,10 +117,42 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
       createdAt: new Date().toISOString(),
     };
 
-    saveProfile(profile);
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 1200);
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      // User is logged in, upsert profile directly
+      const dbData = {
+        id: session.user.id,
+        name: profileData.name,
+        gender: profileData.gender,
+        weight_kg: profileData.weightKg,
+        height_cm: profileData.heightCm,
+        body_fat_pct: profileData.bodyFatPct,
+        goal: profileData.goal,
+        experience: profileData.experience,
+        experience_mode: profileData.experienceMode,
+        equipment: profileData.equipment,
+        duration_minutes: profileData.durationMinutes,
+        training_days: profileData.trainingDays,
+        training_style: profileData.trainingStyle,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase.from("profiles").upsert(dbData);
+      if (error) {
+        console.error("Error saving profile to database:", error);
+      }
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1200);
+    } else {
+      // User not logged in, save to local storage and go to signup
+      saveProfile(profileData);
+      setTimeout(() => {
+        router.push("/signup");
+      }, 1200);
+    }
   };
 
   return (

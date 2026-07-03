@@ -3,25 +3,26 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Dumbbell, Flame, Salad, CalendarCheck, Zap, Users, ShieldAlert, Sparkles, Heart } from "lucide-react";
-import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { getProfile } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
-    const existing = getProfile();
-    if (existing) {
-      router.replace("/dashboard");
-      return;
-    }
-    setCheckingProfile(false);
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        router.replace("/dashboard");
+      } else {
+        setCheckingProfile(false);
+      }
+    });
   }, [router]);
 
   if (checkingProfile) {
-    return <div className="min-h-screen bg-base" />;
+    return <div className="min-h-screen bg-[#0B0B0F]" />;
   }
 
   return (
@@ -83,24 +84,20 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <button
-              onClick={() => setShowOnboarding(true)}
+              onClick={() => router.push("/signup")}
               id="get-started-btn"
               className="btn-primary text-base px-8 py-4 animate-glow-pulse-lime w-full sm:w-auto font-extrabold hover:scale-105 active:scale-95 transition-transform"
             >
               Mulai Sekarang
               <ArrowRight size={20} />
             </button>
-            <a
-              href="#placefoto"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowOnboarding(true);
-              }}
+            <button
+              onClick={() => router.push("/signup")}
               className="btn-secondary text-base px-8 py-4 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white/5"
             >
               <Users size={18} className="text-white/60" />
               Gabung Komunitas
-            </a>
+            </button>
           </div>
 
           {/* PWA offline-ready floating indicator */}
@@ -203,7 +200,6 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </main>
   );
 }

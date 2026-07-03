@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Dumbbell, UtensilsCrossed, LineChart } from "lucide-react";
+import { LayoutDashboard, Dumbbell, UtensilsCrossed, LineChart, User } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/workout", label: "Workout", icon: Dumbbell },
   { href: "/nutrition", label: "Nutrition", icon: UtensilsCrossed },
   { href: "/progress", label: "Progress", icon: LineChart },
+  { href: "/profile", label: "Profile", icon: User },
 ];
 
 export default function BottomNav() {

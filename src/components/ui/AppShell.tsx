@@ -6,10 +6,11 @@ import { useProfile } from "@/lib/useProfile";
 import BottomNav from "@/components/ui/BottomNav";
 import YosBot from "@/components/ui/YosBot";
 import { Dumbbell } from "lucide-react";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { profile, isLoading } = useProfile();
+  const { profile, isLoading, isAuthenticated } = useProfile();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -17,14 +18,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (mounted && !isLoading && !profile) {
+    if (mounted && !isLoading && !isAuthenticated) {
       router.replace("/");
     }
-  }, [isLoading, profile, router, mounted]);
+  }, [isLoading, isAuthenticated, router, mounted]);
 
-  if (!mounted || isLoading || !profile) {
+  if (!mounted || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base">
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0B0F]">
         <div className="flex flex-col items-center gap-3 animate-fade-in">
           <div className="relative">
             <div className="h-14 w-14 rounded-2xl bg-lime/10 border border-lime/20 flex items-center justify-center animate-glow-pulse-lime">
@@ -35,6 +36,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Loading</p>
         </div>
+      </div>
+    );
+  }
+
+  // If user is logged in but hasn't completed onboarding, force show the OnboardingModal
+  if (isAuthenticated && !profile) {
+    return (
+      <div className="relative min-h-screen overflow-x-hidden bg-[#0A0A0E]">
+        <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+          <div className="absolute inset-0 bg-grid-dots opacity-45" />
+          <div className="absolute -top-40 -right-20 h-96 w-96 rounded-full bg-lime/15 blur-[120px]" />
+        </div>
+        <OnboardingModal onClose={() => {}} />
       </div>
     );
   }

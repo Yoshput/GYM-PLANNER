@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Clock, Repeat, Layers, Zap, Check, Trophy, Play, Pause, RotateCcw, SkipForward, Flame, TrendingUp, AlertTriangle } from "lucide-react";
+import { X, Clock, Repeat, Layers, Zap, Check, Trophy, Play, Pause, RotateCcw, SkipForward, Flame, TrendingUp, AlertTriangle, Dumbbell } from "lucide-react";
 import { Exercise } from "@/types";
 import { addLogEntry, isExerciseCompletedToday, getLogs } from "@/lib/storage";
 import { useToast } from "@/components/ui/Toast";
 import { useProfile } from "@/lib/useProfile";
+import { useExerciseGif } from "@/lib/useExerciseGif";
 
 interface ExerciseModalProps {
   exercise: Exercise;
@@ -42,6 +43,7 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
   const { profile } = useProfile();
 
   const isSimpleMode = profile?.experienceMode === "simple";
+  const { gifUrl, source, loading } = useExerciseGif(exercise.name);
 
   const [completed, setCompleted] = useState(() => isExerciseCompletedToday(exercise.id, todayISO));
   const [justCompleted, setJustCompleted] = useState(false);
@@ -288,6 +290,33 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
           <div className="mb-5">
             <h2 className="heading-brutal text-2xl uppercase tracking-tight text-white">{exercise.name}</h2>
             <p className="text-lime text-xs font-bold uppercase tracking-wider mt-1">{exercise.targetMuscle}</p>
+          </div>
+
+          {/* Visual Exercise Demonstration / Placeholder */}
+          <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black/45 border border-white/5 mb-5 relative flex items-center justify-center">
+            {loading ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#15151b] animate-pulse">
+                <div className="h-8 w-8 rounded-full border-2 border-transparent border-t-lime animate-spin mb-2" />
+                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Loading Demo...</p>
+              </div>
+            ) : gifUrl && source !== "none" ? (
+              <img
+                src={gifUrl}
+                alt={exercise.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-center p-4">
+                {/* SVG Animated Placeholder */}
+                <div className="h-14 w-14 rounded-full bg-lime/10 border border-lime/25 flex items-center justify-center text-lime mb-3 animate-pulse">
+                  <Dumbbell size={22} className="animate-bounce" />
+                </div>
+                <p className="text-white/60 text-xs font-semibold">{exercise.name}</p>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-wider mt-1.5 max-w-[220px]">
+                  Demo unavailable — showing animation preview
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Cue Teknik */}

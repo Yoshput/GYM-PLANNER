@@ -72,6 +72,8 @@ export function saveCustomSplit(split: any): void {
   safeSet(KEYS.split, JSON.stringify(split));
 }
 
+import { createClient } from "@/lib/supabase/client";
+
 export function getLogs(): WorkoutLogEntry[] {
   const raw = safeGet(KEYS.logs);
   if (!raw) return [];
@@ -86,6 +88,27 @@ export function addLogEntry(entry: WorkoutLogEntry): void {
   const logs = getLogs();
   logs.push(entry);
   safeSet(KEYS.logs, JSON.stringify(logs));
+
+  // Sync to Supabase if logged in
+  const supabase = createClient();
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user) {
+      supabase
+        .from("workout_logs")
+        .insert({
+          user_id: session.user.id,
+          date: entry.date,
+          day: entry.day,
+          exercise_id: entry.exerciseId,
+          completed_sets: entry.completedSets,
+          weight_used: entry.weightUsed || null,
+          notes: entry.notes || null,
+        })
+        .then(({ error }) => {
+          if (error) console.error("Error saving log to Supabase:", error);
+        });
+    }
+  });
 }
 
 export function isExerciseCompletedToday(exerciseId: string, dateISO: string): boolean {
