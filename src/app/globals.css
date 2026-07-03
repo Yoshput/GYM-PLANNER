@@ -9,6 +9,37 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  /* iOS Safari: smooth momentum scrolling */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ────────────────────────────────────────────
+   iOS Safari Global Optimizations
+──────────────────────────────────────────── */
+
+/* Prevent auto-zoom on input focus (Safari zooms when font < 16px) */
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+/* Touch targets: better tap response on iOS */
+button, [role="button"], a, label {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* Smooth scrolling in all scroll containers */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area support for iPhone notch / Dynamic Island */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body {

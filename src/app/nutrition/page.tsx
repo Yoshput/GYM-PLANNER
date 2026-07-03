@@ -32,6 +32,33 @@ const FOOD_DATABASE = [
   { name: "Kacang Almond", kcal: 579, proteinG: 21, carbsG: 22, fatG: 49, fiberG: 12.5, sugarG: 4.3, sodiumMg: 1, baseGram: 100 },
 ];
 
+const FOOD_PRESETS = [
+  // Protein
+  { label: "🍗 Ayam Goreng",   query: "Ayam goreng 1 potong 100g" },
+  { label: "🍗 Ayam Rebus",    query: "Ayam rebus 1 potong 100g" },
+  { label: "🥩 Daging Sapi",   query: "Daging sapi rebus 100g" },
+  { label: "🥚 Telur Goreng",  query: "Telur goreng 1 butir" },
+  { label: "🥚 Telur Rebus",   query: "Telur rebus 1 butir" },
+  { label: "🦆 Bebek Goreng",  query: "Bebek goreng 1 potong 120g" },
+  { label: "🐟 Ikan Goreng",   query: "Ikan goreng 100g" },
+  { label: "🐟 Ikan Rebus",    query: "Ikan rebus 100g" },
+  // Olahan
+  { label: "🍢 Tempe Goreng",  query: "Tempe goreng 100g" },
+  { label: "🍢 Tempe Rebus",   query: "Tempe rebus 100g" },
+  { label: "🟫 Tahu Goreng",   query: "Tahu goreng 100g" },
+  { label: "🟫 Tahu Rebus",    query: "Tahu rebus 100g" },
+  // Karbohidrat
+  { label: "🍚 Nasi Putih",    query: "Nasi putih 1 centong 100g" },
+  { label: "🍝 Mie Rebus",     query: "Mie rebus 1 porsi 200g" },
+  { label: "🍞 Roti Tawar",    query: "Roti tawar 2 lembar" },
+  { label: "🌽 Jagung Rebus",  query: "Jagung rebus 1 buah" },
+  // Sayuran & Lain
+  { label: "🥦 Sayur Rebus",   query: "Sayur rebus brokoli bayam 100g" },
+  { label: "🥗 Gado-gado",     query: "Gado-gado 1 porsi 200g" },
+  { label: "🍌 Pisang",        query: "Pisang ambon 1 buah" },
+  { label: "🥛 Susu Low Fat",  query: "Susu low fat 200ml" },
+];
+
 function MacroBar({ pct, loggedPct, color, isOver }: { pct: number; loggedPct: number; color: string; isOver: boolean }) {
   const [targetW, setTargetW] = useState(0);
   const [loggedW, setLoggedW] = useState(0);
@@ -424,6 +451,26 @@ function NutritionContent() {
             )}
           </div>
         )}
+
+        {/* ── Food Presets Quick-Tap ── */}
+        <div className="mt-3 pt-3 border-t border-white/5">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-2 flex items-center gap-1">
+            <span>⚡</span> Quick Add Preset
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {FOOD_PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onTouchEnd={(e) => { e.preventDefault(); setShowAIScanner(true); setAiQuery(preset.query); runAIScan(preset.query); }}
+                onClick={() => { setShowAIScanner(true); setAiQuery(preset.query); runAIScan(preset.query); }}
+                className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-[11px] active:bg-lime/10 active:border-lime/30 active:text-lime transition-all touch-manipulation"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ── Water Tracker ── */}

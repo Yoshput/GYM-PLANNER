@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { ChevronRight, Layers, Repeat, Moon, Dumbbell, Edit3, Trash2, PlusCircle, Check, X, Sparkles, RefreshCw } from "lucide-react";
+import { ChevronRight, Layers, Repeat, Moon, Dumbbell, Edit3, Trash2, PlusCircle, Check, X, Sparkles, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
 import AppShell from "@/components/ui/AppShell";
 import { useProfile } from "@/lib/useProfile";
 import { generateWorkoutSplit, DAY_ORDER, DAY_LABELS } from "@/data/workouts";
@@ -99,25 +99,34 @@ function WorkoutContent() {
     setEditingExercise(null);
   };
 
-  const handleDeleteExercise = (exId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // prevent modal opening
+  const handleDeleteExercise = (exId: string) => {
     if (!customSplit) return;
-    
-    if (confirm("Hapus latihan ini dari program hari ini?")) {
-      const dayPlan = customSplit[activeDay];
-      const updatedExercises = dayPlan.exercises.filter(ex => ex.id !== exId);
-      
-      const updatedSplit = {
-        ...customSplit,
-        [activeDay]: {
-          ...dayPlan,
-          exercises: updatedExercises
-        }
-      };
-      
-      setCustomSplit(updatedSplit);
-      saveCustomSplit(updatedSplit);
-    }
+    if (!window.confirm("Hapus latihan ini dari program hari ini?")) return;
+    const dayPlan = customSplit[activeDay];
+    const updatedExercises = dayPlan.exercises.filter(ex => ex.id !== exId);
+    const updatedSplit = {
+      ...customSplit,
+      [activeDay]: { ...dayPlan, exercises: updatedExercises }
+    };
+    setCustomSplit(updatedSplit);
+    saveCustomSplit(updatedSplit);
+  };
+
+  const handleMoveExercise = (exId: string, direction: "up" | "down") => {
+    if (!customSplit) return;
+    const dayPlan = customSplit[activeDay];
+    const exercises = [...dayPlan.exercises];
+    const idx = exercises.findIndex(ex => ex.id === exId);
+    if (idx < 0) return;
+    const newIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (newIdx < 0 || newIdx >= exercises.length) return;
+    [exercises[idx], exercises[newIdx]] = [exercises[newIdx], exercises[idx]];
+    const updatedSplit = {
+      ...customSplit,
+      [activeDay]: { ...dayPlan, exercises }
+    };
+    setCustomSplit(updatedSplit);
+    saveCustomSplit(updatedSplit);
   };
 
   const handleAddExercise = (e: React.FormEvent) => {
@@ -294,17 +303,47 @@ function WorkoutContent() {
             {dayPlan.exercises.map((exercise, idx) => (
               <div 
                 key={exercise.id} 
-                className="relative group"
+                className="relative group flex items-center gap-2"
               >
-                <button
-                  onClick={() => {
-                    if (isEditing) {
-                      setEditingExercise(exercise);
-                    } else {
-                      setActiveExercise(exercise);
-                    }
+                {/* Reorder buttons — visible only in edit mode */}
+                {isEditing && (
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onTouchEnd={(e) => { e.preventDefault(); handleMoveExercise(exercise.id, "up"); }}
+                      onClick={() => handleMoveExercise(exercise.id, "up")}
+                      className="h-7 w-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 disabled:opacity-20 active:bg-white/10 transition-all"
+                    >
+                      <ChevronUp size={13} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === dayPlan.exercises.length - 1}
+                      onTouchEnd={(e) => { e.preventDefault(); handleMoveExercise(exercise.id, "down"); }}
+                      onClick={() => handleMoveExercise(exercise.id, "down")}
+                      className="h-7 w-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 disabled:opacity-20 active:bg-white/10 transition-all"
+                    >
+                      <ChevronDown size={13} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Exercise card — using div instead of nested button to fix iOS Safari tap bug */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onTouchEnd={(e) => {
+                    // Only trigger if not tapping action buttons
+                    if ((e.target as HTMLElement).closest('[data-action]')) return;
+                    if (isEditing) setEditingExercise(exercise);
+                    else setActiveExercise(exercise);
                   }}
-                  className={`w-full glass-card flex items-center gap-4 p-4 text-left active:scale-[0.98] transition-all duration-150 hover:border-white/10 animate-stagger-in`}
+                  onClick={() => {
+                    if (isEditing) setEditingExercise(exercise);
+                    else setActiveExercise(exercise);
+                  }}
+                  className={`flex-1 glass-card flex items-center gap-4 p-4 text-left active:scale-[0.98] transition-all duration-150 hover:border-white/10 animate-stagger-in cursor-pointer`}
                   style={{ animationDelay: `${idx * 0.05}s` }}
                 >
                   {/* Number / Action badge */}
@@ -334,16 +373,19 @@ function WorkoutContent() {
                   
                   {isEditing ? (
                     <button
-                      onClick={(e) => handleDeleteExercise(exercise.id, e)}
-                      className="h-8 w-8 rounded-lg bg-ember/10 border border-ember/25 text-ember flex items-center justify-center hover:bg-ember/20 active:scale-90 transition-all shrink-0"
+                      data-action="delete"
+                      type="button"
+                      onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); handleDeleteExercise(exercise.id); }}
+                      onClick={(e) => { e.stopPropagation(); handleDeleteExercise(exercise.id); }}
+                      className="h-9 w-9 rounded-xl bg-ember/10 border border-ember/25 text-ember flex items-center justify-center active:bg-ember/20 transition-all shrink-0 touch-manipulation"
                       title="Hapus gerakan"
                     >
-                      <Trash2 size={13} />
+                      <Trash2 size={14} />
                     </button>
                   ) : (
                     <ChevronRight size={16} className="text-white/20 shrink-0" />
                   )}
-                </button>
+                </div>
               </div>
             ))}
 
