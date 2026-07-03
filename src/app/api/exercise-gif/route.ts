@@ -17,13 +17,15 @@ export async function GET(request: Request) {
     }
 
     // 1. Check cache in Supabase (case-insensitive check)
-    const { data: cached, error: cacheError } = await supabaseAdmin
+    // Skip "none" cache entries so improved fallback logic can retry
+    const { data: cached } = await supabaseAdmin
       .from("exercise_gif_cache")
       .select("*")
       .ilike("exercise_name", exerciseName)
+      .not("source", "eq", "none")
       .maybeSingle();
 
-    if (cached) {
+    if (cached && cached.gif_url) {
       return NextResponse.json({
         gifUrl: cached.gif_url,
         source: cached.source,
@@ -64,20 +66,34 @@ export async function GET(request: Request) {
     // 3. Fallback to free-exercise-db if WorkoutX failed or had no result
     if (!gifUrl) {
       try {
-        // Format name to match yuhonas/free-exercise-db format:
-        // Capitalize each word and replace spaces with underscore
-        const formattedName = exerciseName
-          .split(" ")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-          .join("_");
+        // Generate multiple name variations to try
+        const toTitleCase = (s: string) =>
+          s.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("_");
 
-        const fallbackUrl = `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${formattedName}/0.jpg`;
-        
-        // Verify if image exists by checking HEAD
-        const checkRes = await fetch(fallbackUrl, { method: "HEAD" });
-        if (checkRes.ok) {
-          gifUrl = fallbackUrl;
-          source = "free-exercise-db";
+        // Strip common prefixes/suffixes & parenthetical notes for alternate tries
+        const cleanName = exerciseName
+          .replace(/\s*\(.*?\)/g, "")  // remove "(RDL)", "(Conditioning)" etc
+          .replace(/\s*\/.*$/, "")     // remove "/ Rack Pull" etc
+          .trim();
+
+        const nameVariations = [
+          exerciseName,          // original
+          cleanName,             // stripped
+          // Remove first word (e.g. "Barbell Back Squat" → "Back Squat")
+          cleanName.split(" ").slice(1).join(" "),
+          // Remove second word (e.g. "Barbell Back Squat" → "Barbell Squat")  
+          cleanName.split(" ").filter((_,i) => i !== 1).join(" "),
+        ].filter(Boolean);
+
+        for (const variant of nameVariations) {
+          const formattedName = toTitleCase(variant);
+          const fallbackUrl = `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${formattedName}/0.jpg`;
+          const checkRes = await fetch(fallbackUrl, { method: "HEAD" });
+          if (checkRes.ok) {
+            gifUrl = fallbackUrl;
+            source = "free-exercise-db";
+            break;
+          }
         }
       } catch (err) {
         console.error("Free Exercise DB fallback check failed:", err);

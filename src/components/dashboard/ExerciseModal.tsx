@@ -306,15 +306,25 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="flex flex-col items-center justify-center text-center p-4">
-                {/* SVG Animated Placeholder */}
-                <div className="h-14 w-14 rounded-full bg-lime/10 border border-lime/25 flex items-center justify-center text-lime mb-3 animate-pulse">
-                  <Dumbbell size={22} className="animate-bounce" />
+              <div className="flex flex-col items-center justify-center text-center p-4 gap-3">
+                <div className="h-14 w-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 mb-1">
+                  <Dumbbell size={22} />
                 </div>
-                <p className="text-white/60 text-xs font-semibold">{exercise.name}</p>
-                <p className="text-white/30 text-[9px] font-bold uppercase tracking-wider mt-1.5 max-w-[220px]">
-                  Demo unavailable — showing animation preview
-                </p>
+                <div>
+                  <p className="text-white/50 text-xs font-semibold">{exercise.name}</p>
+                  <p className="text-white/25 text-[9px] font-bold uppercase tracking-wider mt-1">
+                    Animasi tidak tersedia
+                  </p>
+                </div>
+                <a
+                  href={`https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + " exercise tutorial")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/15 border border-red-500/25 text-red-400 text-[10px] font-bold hover:bg-red-500/25 transition-colors"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  Lihat Tutorial di YouTube
+                </a>
               </div>
             )}
           </div>

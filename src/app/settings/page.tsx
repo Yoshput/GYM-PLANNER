@@ -7,6 +7,7 @@ import AppShell from "@/components/ui/AppShell";
 import { useToast } from "@/components/ui/Toast";
 import { useProfile } from "@/lib/useProfile";
 import { saveProfile } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
   return (
@@ -110,14 +111,26 @@ function SettingsContent() {
     reader.readAsText(file);
   };
 
-  const handleFactoryReset = () => {
+  const handleFactoryReset = async () => {
     if (confirm("⚠️ PERINGATAN: Tindakan ini akan menghapus SELURUH profil, riwayat latihan, foto progres, dan data hidrasi Anda secara permanen. Lanjutkan?")) {
+      try {
+        // Hapus profil dari Supabase DB agar onboarding muncul lagi
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await supabase.from("profiles").delete().eq("id", session.user.id);
+        }
+      } catch (e) {
+        console.error("Gagal hapus profil dari DB:", e);
+      }
+      // Hapus semua data lokal
       localStorage.clear();
       showToast("Reset Berhasil 🗑️", {
         sub: "Semua data telah dihapus bersih.",
         variant: "success",
       });
-      setTimeout(() => window.location.href = "/", 1500);
+      // Kembali ke dashboard → onboarding akan muncul karena profil sudah dihapus
+      setTimeout(() => window.location.href = "/dashboard", 1500);
     }
   };
 

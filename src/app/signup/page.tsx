@@ -55,7 +55,13 @@ export default function SignupPage() {
         router.push("/login");
       }, 3000);
     } catch (err: any) {
-      setError(err.message || "Gagal mendaftar. Silakan coba kembali.");
+      const msg =
+        typeof err?.message === "string" && err.message
+          ? err.message
+          : typeof err === "string" && err
+          ? err
+          : "Gagal mendaftar. Silakan coba kembali.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
