@@ -3,40 +3,64 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Dumbbell, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft } from "lucide-react";
+import { Dumbbell, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // username or email
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const isEmail = (val: string) => val.includes("@");
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!identifier || !password) return;
 
     setLoading(true);
     setError("");
 
     try {
+      let emailToUse = identifier.trim();
+
+      // If input is username (no @), look up the email
+      if (!isEmail(identifier)) {
+        const res = await fetch("/api/auth/find-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: identifier.trim() }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.email) {
+          throw new Error("Username tidak ditemukan. Coba gunakan email.");
+        }
+        emailToUse = data.email;
+      }
+
       const { error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: emailToUse,
         password: password.trim(),
       });
 
       if (authError) {
-        throw authError;
+        if (authError.message.includes("Invalid login credentials")) {
+          throw new Error("Username/Email atau password salah.");
+        }
+        throw new Error(authError.message || "Gagal masuk. Silakan coba lagi.");
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.message || "Gagal masuk. Silakan periksa email dan password Anda.");
+      const msg =
+        typeof err?.message === "string" && err.message.trim()
+          ? err.message
+          : "Gagal masuk. Periksa username/email dan password.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -44,7 +68,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center px-4 relative overflow-hidden bg-[#0A0A0E]">
-      {/* Background Elements */}
+      {/* Background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute inset-0 bg-grid-dots opacity-40" />
         <div className="absolute -top-40 -right-20 h-96 w-96 rounded-full bg-lime/10 blur-[120px]" />
@@ -52,7 +76,7 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10 animate-scale-in">
-        {/* Back Button */}
+        {/* Back */}
         <div className="mb-6">
           <Link
             href="/"
@@ -62,6 +86,7 @@ export default function LoginPage() {
             Kembali ke Beranda
           </Link>
         </div>
+
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
           <div className="h-12 w-12 rounded-2xl bg-lime flex items-center justify-center shadow-[0_0_30px_rgba(204,255,0,0.4)] mb-4">
@@ -83,18 +108,28 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
+            {/* Username or Email */}
             <div>
-              <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Email Address</label>
-              <input
-                type="email"
-                placeholder="Contoh: yosfit@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-lime/45 transition-colors placeholder-white/20"
-                required
-              />
+              <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">
+                Username atau Email
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
+                  <User size={14} />
+                </span>
+                <input
+                  type="text"
+                  placeholder="username atau email@contoh.com"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 pl-8 pr-3 text-sm text-white focus:outline-none focus:border-lime/45 transition-colors placeholder-white/20"
+                  required
+                  autoComplete="username"
+                />
+              </div>
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Password</label>
               <div className="relative">
@@ -124,7 +159,7 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  Memproses...
+                  {isEmail(identifier) ? "Memproses..." : "Mencari akun..."}
                 </>
               ) : (
                 "Masuk ke Gym Planner"

@@ -142,16 +142,15 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
       const { error } = await supabase.from("profiles").upsert(dbData);
       if (error) {
         console.error("Error saving profile to database:", error);
+        setIsSubmitting(false);
+        return;
       }
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1200);
+      // Force full reload so useProfile re-fetches the new profile from Supabase
+      window.location.href = "/dashboard";
     } else {
       // User not logged in, save to local storage and go to signup
       saveProfile(profileData);
-      setTimeout(() => {
-        router.push("/signup");
-      }, 1200);
+      window.location.href = "/signup";
     }
   };
 
