@@ -20,16 +20,69 @@
 
 html.light {
   /* Light Theme Tokens */
-  --color-base: #FAFAF8;
+  --color-base: #F8FAFC;
   --color-base-card: #FFFFFF;
-  --color-base-raised: #F0F0EC;
-  --color-base-border: #E0E0DA;
-  --text-primary: #14140F;
-  --text-secondary: #6B6B63;
-  --color-bg-gradient-1: rgba(122, 153, 0, 0.04);
-  --color-bg-gradient-2: rgba(255, 69, 0, 0.03);
-  --color-grid-dot: rgba(0, 0, 0, 0.03);
+  --color-base-raised: #F1F5F9;
+  --color-base-border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --color-bg-gradient-1: rgba(99, 102, 241, 0.06);
+  --color-bg-gradient-2: rgba(244, 63, 94, 0.05);
+  --color-grid-dot: rgba(99, 102, 241, 0.04);
 }
+
+/* Light mode contrast overrides for text & backgrounds */
+html.light .text-white\/20 { color: #94A3B8 !important; }
+html.light .text-white\/25 { color: #64748B !important; }
+html.light .text-white\/35 { color: #475569 !important; }
+html.light .text-white\/45 { color: #334155 !important; }
+html.light .text-white\/50 { color: #1E293B !important; }
+html.light .text-white\/60 { color: #0F172A !important; }
+html.light .text-white\/70 { color: #0F172A !important; }
+html.light .text-white { color: #0F172A !important; }
+html.light .bg-white\/1 { background-color: rgba(99, 102, 241, 0.03) !important; }
+html.light .bg-white\/2 { background-color: rgba(99, 102, 241, 0.04) !important; }
+html.light .bg-white\/3 { background-color: rgba(99, 102, 241, 0.05) !important; }
+html.light .bg-white\/5 { background-color: rgba(99, 102, 241, 0.08) !important; border-color: rgba(99, 102, 241, 0.15) !important; }
+html.light .bg-white\/10 { background-color: rgba(99, 102, 241, 0.12) !important; }
+html.light .border-white\/5 { border-color: rgba(99, 102, 241, 0.1) !important; }
+html.light .border-white\/10 { border-color: rgba(99, 102, 241, 0.18) !important; }
+html.light .bg-base-raised\/30 { background-color: #F1F5F9 !important; }
+html.light .bg-black\/40 { background-color: #FFFFFF !important; border-color: #CBD5E1 !important; }
+html.light .text-lime { color: #4F46E5 !important; } /* In light mode, turn lime accent text to deep indigo for high contrast readability */
+html.light .bg-lime\/10 { background-color: rgba(79, 70, 229, 0.08) !important; }
+html.light .border-lime\/20 { border-color: rgba(79, 70, 229, 0.18) !important; }
+html.light .border-lime\/30 { border-color: rgba(79, 70, 229, 0.28) !important; }
+html.light .bg-lime\/15 { background-color: rgba(79, 70, 229, 0.12) !important; }
+html.light .text-gradient-lime {
+  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+html.light .shimmer-border::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(79, 70, 229, 0.4) 40%,
+    rgba(244, 63, 94, 0.3) 60%,
+    transparent 100%
+  );
+}
+html.light .bg-grid-dots {
+  background-image: radial-gradient(circle, rgba(99,102,241,0.06) 1px, transparent 1px);
+}
+html.light .glass-card {
+  background-color: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+}
+html.light body {
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(99, 102, 241, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(244, 63, 94, 0.06), transparent 50%);
+}
+
 
 html {
   -webkit-tap-highlight-color: transparent;
