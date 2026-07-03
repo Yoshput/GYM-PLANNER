@@ -40,47 +40,35 @@ export function useProfile(): UseProfileResult {
         .eq("id", session.user.id)
         .single();
 
-      // Check if we need to sync from localStorage
+      // Check localStorage - but ONLY if it belongs to the current user
       let localProfile: any = null;
       try {
         const raw = window.localStorage.getItem("gym-planner:profile");
-        if (raw) localProfile = JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          // Only use localStorage if it matches current user (has userId field matching)
+          // or if there's no userId field stored (legacy - first time migration only)
+          const storedUserId = window.localStorage.getItem("gym-planner:userId");
+          if (!storedUserId || storedUserId === session.user.id) {
+            localProfile = parsed;
+          } else {
+            // Different user's data - clear all localStorage to prevent contamination
+            console.log("[useProfile] Clearing stale localStorage from different user");
+            window.localStorage.clear();
+          }
+        }
       } catch {}
 
       if (error || !dbProfile || !dbProfile.goal) {
-        // If DB has no profile details, but we have local profile, sync it
-        if (localProfile && localProfile.goal) {
-          const dbData: any = {
-            id: session.user.id,
-            name: localProfile.name || session.user.email?.split("@")[0] || "User",
-            profile_image: localProfile.profileImage || null,
-            gender: localProfile.gender || "male",
-            weight_kg: localProfile.weightKg || 70,
-            height_cm: localProfile.heightCm || 170,
-            body_fat_pct: localProfile.bodyFatPct || 15,
-            goal: localProfile.goal || "maintenance",
-            experience: localProfile.experience || "beginner",
-            experience_mode: localProfile.experienceMode || "simple",
-            equipment: localProfile.equipment || "dumbbell",
-            duration_minutes: localProfile.durationMinutes || 60,
-            training_days: localProfile.trainingDays || 4,
-            training_style: localProfile.trainingStyle || "auto",
-            updated_at: new Date().toISOString(),
-          };
-
-          const { error: syncError } = await supabase.from("profiles").upsert(dbData);
-          if (!syncError) {
-            // Remove local profile once synced to keep it clean
-            try {
-              window.localStorage.removeItem("gym-planner:profile");
-            } catch {}
-            await refresh();
-            return;
-          }
-        }
+        // New user with no DB profile → show onboarding (do NOT sync stale local data)
         setProfile(null);
       } else {
         // Map database fields to UserProfile
+        // Also store current userId in localStorage to detect user switches
+        try {
+          window.localStorage.setItem("gym-planner:userId", session.user.id);
+        } catch {}
+
         const mappedProfile: UserProfile = {
           name: dbProfile.name || session.user.email?.split("@")[0] || "User",
           profileImage: dbProfile.profile_image || undefined,
