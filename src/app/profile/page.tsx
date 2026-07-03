@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Dumbbell, LogOut, Trash2, Save, User, Loader2, AlertCircle, Sparkles } from "lucide-react";
+import { Dumbbell, LogOut, Trash2, Save, User, Loader2, AlertCircle, Sparkles, Camera } from "lucide-react";
 import AppShell from "@/components/ui/AppShell";
 import { useProfile } from "@/lib/useProfile";
 import { createClient } from "@/lib/supabase/client";
+import { saveProfile } from "@/lib/storage";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -36,6 +37,28 @@ export default function ProfilePage() {
       setExperience(profile.experience || "beginner");
     }
   }, [profile]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        if (profile) {
+          await updateProfile({
+            ...profile,
+            profileImage: base64
+          });
+          // Also save in local storage for instant sync
+          saveProfile({ ...profile, profileImage: base64 });
+          refresh();
+          setSuccess("Foto profil berhasil diperbarui!");
+          setTimeout(() => setSuccess(""), 3000);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,13 +108,9 @@ export default function ProfilePage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Perform delete user account (we can delete the user via API or we delete profile row and call a trigger/edge function if configured)
-        // Since we don't have an admin key on client, we can call an auth API or delete the profile row first.
-        // Let's delete the profile row first, then call supabase sign out or trigger account deletion.
         const { error: deleteError } = await supabase.from("profiles").delete().eq("id", user.id);
         if (deleteError) throw deleteError;
 
-        // Delete user session
         await supabase.auth.signOut();
         alert("Akun Anda telah berhasil dihapus.");
         router.push("/");
@@ -116,8 +135,21 @@ export default function ProfilePage() {
         {/* Profile Card */}
         <div className="glass-card p-6 mb-6 animate-scale-in">
           <div className="flex items-center gap-4 mb-6">
-            <div className="h-16 w-16 rounded-full bg-lime/10 border border-lime/20 flex items-center justify-center text-lime shrink-0">
-              <User size={32} />
+            <div className="relative group shrink-0">
+              <label className="block cursor-pointer">
+                <div className="h-16 w-16 rounded-full bg-lime/10 border border-lime/20 flex items-center justify-center text-lime overflow-hidden relative">
+                  {profile?.profileImage ? (
+                    <img src={profile.profileImage} alt="Profile" className="h-full w-full object-cover" />
+                  ) : (
+                    <User size={32} />
+                  )}
+                  {/* Overlay camera on hover */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-200">
+                    <Camera size={16} />
+                  </div>
+                </div>
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              </label>
             </div>
             <div>
               <h2 className="heading-brutal text-xl text-white">{name || "Gym Member"}</h2>

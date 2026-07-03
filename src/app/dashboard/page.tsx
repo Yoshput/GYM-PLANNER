@@ -26,7 +26,8 @@ import {
   Settings,
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  User
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import AppShell from "@/components/ui/AppShell";
@@ -243,13 +244,10 @@ function DashboardContent() {
         </div>
         <div className="flex gap-2 items-center">
           {streak.count > 0 && (
-            <div className="flex items-center gap-1 bg-ember/15 border border-ember/25 px-2.5 py-1 rounded-xl text-ember font-bold text-xs">
-              <span>🔥</span> {streak.count} Hari
+            <div className="flex items-center gap-1 bg-ember/15 border border-ember/25 px-2 py-0.5 rounded-lg text-ember font-bold text-[10px]" title="Streak Latihan Anda">
+              <span>🔥</span> {streak.count}
             </div>
           )}
-          <span className="chip bg-lime/15 text-lime border border-lime/20 font-extrabold">
-            {GOAL_META[profile.goal].icon}&nbsp;{GOAL_META[profile.goal].label}
-          </span>
           <ThemeToggleButton />
           <Link
             href="/settings"
@@ -257,6 +255,17 @@ function DashboardContent() {
             title="Pengaturan Aplikasi"
           >
             <Settings size={15} />
+          </Link>
+          <Link
+            href="/profile"
+            className="h-8.5 w-8.5 rounded-full overflow-hidden border border-white/10 hover:border-lime/20 flex items-center justify-center bg-lime/10 text-lime shrink-0"
+            title="Profil Saya"
+          >
+            {profile.profileImage ? (
+              <img src={profile.profileImage} alt={profile.name} className="h-full w-full object-cover" />
+            ) : (
+              <User size={14} />
+            )}
           </Link>
         </div>
       </div>
@@ -491,62 +500,6 @@ function DashboardContent() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* ── Profile Summary ── */}
-      <div className="glass-card p-5 mb-6 animate-stagger-in stagger-3 relative overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-white/35">Profil Saya</p>
-          <button
-            onClick={() => {
-              if (confirm("Apakah Anda yakin ingin keluar dan membuat program latihan baru?")) {
-                import("@/lib/storage").then((m) => m.clearProfile());
-                window.location.href = "/";
-              }
-            }}
-            className="text-[10px] font-bold text-ember hover:text-ember-dim transition-colors uppercase tracking-wider flex items-center gap-1 active:scale-95"
-          >
-            Reset Profil
-          </button>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative group shrink-0">
-            <label
-              htmlFor="avatar-upload"
-              className="cursor-pointer block relative rounded-2xl overflow-hidden h-16 w-16 bg-lime/10 border-2 border-lime/30 flex items-center justify-center text-white hover:border-lime transition-all"
-            >
-              {profile.profileImage ? (
-                <img src={profile.profileImage} alt={profile.name} className="h-full w-full object-cover" />
-              ) : (
-                <span className="text-2xl font-extrabold text-lime font-display">{profile.name.slice(0, 2).toUpperCase()}</span>
-              )}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                <Camera size={18} className="text-lime" />
-              </div>
-            </label>
-            <input type="file" id="avatar-upload" accept="image/*" className="hidden" onChange={handleImageUpload} />
-          </div>
-
-          <div className="flex-1">
-            <h3 className="font-display font-extrabold uppercase text-white tracking-wide text-sm">{profile.name}</h3>
-            <p className="text-xs text-white/40 mb-1 flex items-center gap-1.5 uppercase font-bold tracking-wider">
-              {LEVEL_META[profile.experience].icon}
-              {LEVEL_META[profile.experience].label} Level
-            </p>
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              <span className="chip bg-base-raised text-white/70 border border-base-border/50 text-[10px] py-0.5 px-2">
-                {profile.weightKg} kg
-              </span>
-              <span className="chip bg-base-raised text-white/70 border border-base-border/50 text-[10px] py-0.5 px-2">
-                {profile.heightCm} cm
-              </span>
-              <span className="chip bg-base-raised text-white/70 border border-base-border/50 text-[10px] py-0.5 px-2">
-                {profile.bodyFatPct}% BF
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 

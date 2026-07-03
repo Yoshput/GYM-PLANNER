@@ -18,6 +18,42 @@
   --color-grid-dot: rgba(255, 255, 255, 0.04);
 }
 
+/* Spiderman Theme */
+html.theme-spiderman {
+  --color-base: #060608;
+  --color-base-card: #0E0F12;
+  --color-base-raised: #15171C;
+  --color-base-border: #2C0F14;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --color-bg-gradient-1: rgba(239, 68, 68, 0.08); /* Web Red */
+  --color-bg-gradient-2: rgba(59, 130, 246, 0.06); /* Web Blue */
+  --color-grid-dot: rgba(239, 68, 68, 0.04);
+}
+html.theme-spiderman body {
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(239, 68, 68, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(59, 130, 246, 0.08), transparent 50%);
+}
+
+/* David Laid Gym Theme */
+html.theme-davidlaid {
+  --color-base: #030303;
+  --color-base-card: #0A0A0C;
+  --color-base-raised: #121214;
+  --color-base-border: #1C1C1F;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --color-bg-gradient-1: rgba(255, 255, 255, 0.03); /* Silver Steel */
+  --color-bg-gradient-2: rgba(255, 255, 255, 0.015);
+  --color-grid-dot: rgba(255, 255, 255, 0.02);
+}
+html.theme-davidlaid body {
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.04), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.02), transparent 50%);
+}
+
 html.light {
   /* Light Theme Tokens */
   --color-base: #F8FAFC;
@@ -298,3 +334,20 @@ body {
   filter: blur(10px);
   pointer-events: none;
 }
+
+/* Bottom Nav bar light mode visibility fixes */
+html.light nav[aria-label="Primary navigation"] .text-white\/35 {
+  color: #64748B !important;
+}
+html.light nav[aria-label="Primary navigation"] .bg-lime\/10 {
+  background-color: rgba(79, 70, 229, 0.08) !important;
+  border-color: rgba(79, 70, 229, 0.15) !important;
+}
+html.light nav[aria-label="Primary navigation"] .text-lime {
+  color: #4F46E5 !important;
+}
+html.light nav[aria-label="Primary navigation"] .bg-base-card\/80 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #E2E8F0 !important;
+}
+

@@ -29,12 +29,35 @@ function SettingsContent() {
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
 
+  const [customThemeStyle, setCustomThemeStyle] = useState("default");
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setMetricUnit(localStorage.getItem("gym-planner:unit") !== "imperial");
       setCustomKey(localStorage.getItem("gym-planner:gemini-key") || "");
+      setCustomThemeStyle(localStorage.getItem("gym-planner:custom-theme-style") || "default");
     }
   }, []);
+
+  const handleCustomThemeChange = (newTheme: string) => {
+    setCustomThemeStyle(newTheme);
+    if (typeof window !== "undefined") {
+      // Clear old theme classes
+      document.documentElement.classList.remove("theme-spiderman", "theme-davidlaid");
+      
+      if (newTheme === "default") {
+        localStorage.removeItem("gym-planner:custom-theme-style");
+      } else {
+        localStorage.setItem("gym-planner:custom-theme-style", newTheme);
+        document.documentElement.classList.add("theme-" + newTheme);
+      }
+      showToast("Tema Diubah 🎨", {
+        sub: "Memuat ulang aplikasi untuk menerapkan tema...",
+        variant: "success",
+      });
+      setTimeout(() => window.location.reload(), 1200);
+    }
+  };
 
   const handleSubmitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,6 +228,23 @@ function SettingsContent() {
       <div className="glass-card p-5 mb-5 space-y-4">
         <p className="text-xs font-bold uppercase tracking-widest text-white/35">Preferensi Latihan</p>
         
+        {/* Metric vs Imperial */}
+        <div className="flex items-center justify-between py-2 border-b border-white/5">
+          <div>
+            <p className="text-sm font-bold text-white/90">Gaya Tema Kustom 🎨</p>
+            <p className="text-[10px] text-white/35">Ubah skema warna visual aplikasi</p>
+          </div>
+          <select
+            value={customThemeStyle}
+            onChange={(e) => handleCustomThemeChange(e.target.value)}
+            className="bg-black/40 border border-base-border rounded-xl py-1.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 cursor-pointer font-bold"
+          >
+            <option value="default" className="bg-[#111] text-white">Default (Zenith Glow)</option>
+            <option value="spiderman" className="bg-[#111] text-red-500">🕷️ Spiderman Style</option>
+            <option value="davidlaid" className="bg-[#111] text-gray-400">🏋️ David Laid Gym</option>
+          </select>
+        </div>
+
         {/* Metric vs Imperial */}
         <div className="flex items-center justify-between py-2 border-b border-white/5">
           <div>
