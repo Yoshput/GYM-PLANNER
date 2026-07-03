@@ -3,6 +3,7 @@ import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ui/ServiceWorkerRegister";
 import { ToastProvider } from "@/components/ui/Toast";
+import SafariInstallBanner from "@/components/ui/SafariInstallBanner";
 
 const interBody = Inter({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           {children}
         </ToastProvider>
+        <SafariInstallBanner />
         <ServiceWorkerRegister />
       </body>
     </html>

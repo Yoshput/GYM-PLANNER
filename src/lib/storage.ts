@@ -10,14 +10,40 @@ function isBrowser() {
   return typeof window !== "undefined";
 }
 
-export function saveProfile(profile: UserProfile): void {
+// Safari-safe localStorage wrapper — handles Private Mode & ITP gracefully
+function safeGet(key: string): string | null {
+  if (!isBrowser()) return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSet(key: string, value: string): void {
   if (!isBrowser()) return;
-  window.localStorage.setItem(KEYS.profile, JSON.stringify(profile));
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Safari Private Mode throws QuotaExceededError — silently ignore
+  }
+}
+
+function safeRemove(key: string): void {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Ignore
+  }
+}
+
+export function saveProfile(profile: UserProfile): void {
+  safeSet(KEYS.profile, JSON.stringify(profile));
 }
 
 export function getProfile(): UserProfile | null {
-  if (!isBrowser()) return null;
-  const raw = window.localStorage.getItem(KEYS.profile);
+  const raw = safeGet(KEYS.profile);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as UserProfile;
@@ -27,15 +53,13 @@ export function getProfile(): UserProfile | null {
 }
 
 export function clearProfile(): void {
-  if (!isBrowser()) return;
-  window.localStorage.removeItem(KEYS.profile);
-  window.localStorage.removeItem(KEYS.logs);
-  window.localStorage.removeItem(KEYS.split);
+  safeRemove(KEYS.profile);
+  safeRemove(KEYS.logs);
+  safeRemove(KEYS.split);
 }
 
 export function getCustomSplit(): any | null {
-  if (!isBrowser()) return null;
-  const raw = window.localStorage.getItem(KEYS.split);
+  const raw = safeGet(KEYS.split);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -45,13 +69,11 @@ export function getCustomSplit(): any | null {
 }
 
 export function saveCustomSplit(split: any): void {
-  if (!isBrowser()) return;
-  window.localStorage.setItem(KEYS.split, JSON.stringify(split));
+  safeSet(KEYS.split, JSON.stringify(split));
 }
 
 export function getLogs(): WorkoutLogEntry[] {
-  if (!isBrowser()) return [];
-  const raw = window.localStorage.getItem(KEYS.logs);
+  const raw = safeGet(KEYS.logs);
   if (!raw) return [];
   try {
     return JSON.parse(raw) as WorkoutLogEntry[];
@@ -61,10 +83,9 @@ export function getLogs(): WorkoutLogEntry[] {
 }
 
 export function addLogEntry(entry: WorkoutLogEntry): void {
-  if (!isBrowser()) return;
   const logs = getLogs();
   logs.push(entry);
-  window.localStorage.setItem(KEYS.logs, JSON.stringify(logs));
+  safeSet(KEYS.logs, JSON.stringify(logs));
 }
 
 export function isExerciseCompletedToday(exerciseId: string, dateISO: string): boolean {
