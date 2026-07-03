@@ -5,6 +5,30 @@
 :root {
   --font-display: "Inter Tight", "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
+
+  /* Dark Theme Tokens (Default) */
+  --color-base: #0B0B0F;
+  --color-base-card: #121217;
+  --color-base-raised: #17171D;
+  --color-base-border: #232329;
+  --text-primary: #f5f5f7;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --color-bg-gradient-1: rgba(204, 255, 0, 0.06);
+  --color-bg-gradient-2: rgba(255, 69, 0, 0.07);
+  --color-grid-dot: rgba(255, 255, 255, 0.04);
+}
+
+html.light {
+  /* Light Theme Tokens */
+  --color-base: #FAFAF8;
+  --color-base-card: #FFFFFF;
+  --color-base-raised: #F0F0EC;
+  --color-base-border: #E0E0DA;
+  --text-primary: #14140F;
+  --text-secondary: #6B6B63;
+  --color-bg-gradient-1: rgba(122, 153, 0, 0.04);
+  --color-bg-gradient-2: rgba(255, 69, 0, 0.03);
+  --color-grid-dot: rgba(0, 0, 0, 0.03);
 }
 
 html {
@@ -43,12 +67,13 @@ button, [role="button"], a, label {
 }
 
 body {
-  background-color: #0b0b0f;
+  background-color: var(--color-base);
   background-image:
-    radial-gradient(circle at 15% 0%, rgba(204, 255, 0, 0.06), transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(255, 69, 0, 0.07), transparent 45%);
-  color: #f5f5f7;
+    radial-gradient(circle at 15% 0%, var(--color-bg-gradient-1), transparent 40%),
+    radial-gradient(circle at 85% 20%, var(--color-bg-gradient-2), transparent 45%);
+  color: var(--text-primary);
   overscroll-behavior-y: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ────────────────────────────────────────────
@@ -121,7 +146,12 @@ body {
 
 @layer components {
   .glass-card {
-    @apply bg-base-card/70 backdrop-blur-md border border-base-border rounded-xl2 shadow-[0_8px_30px_rgba(0,0,0,0.35)];
+    background-color: var(--color-base-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-base-border);
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   }
 
   .glass-card-hover {
@@ -133,7 +163,7 @@ body {
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-lime text-base font-display font-bold uppercase tracking-wide px-6 py-3.5 min-h-[52px] active:scale-[0.97] transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-lime text-black font-display font-bold uppercase tracking-wide px-6 py-3.5 min-h-[52px] active:scale-[0.97] transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none;
     box-shadow: 0 0 20px rgba(204, 255, 0, 0.3), 0 4px 15px rgba(204, 255, 0, 0.2);
   }
   .btn-primary:not(:disabled):hover {
@@ -141,7 +171,10 @@ body {
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-base-border bg-base-raised/60 text-white font-display font-semibold uppercase tracking-wide px-6 py-3.5 min-h-[52px] active:scale-[0.97] transition-transform duration-150;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3.5 min-h-[52px] active:scale-[0.97] transition-transform duration-150 font-display font-semibold uppercase tracking-wide;
+    background-color: var(--color-base-raised);
+    border-color: var(--color-base-border);
+    color: var(--text-primary);
   }
 
   .chip {

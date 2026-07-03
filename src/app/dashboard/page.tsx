@@ -24,8 +24,11 @@ import {
   Droplets,
   Plus,
   Settings,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import AppShell from "@/components/ui/AppShell";
 import { useProfile } from "@/lib/useProfile";
 import { generateWorkoutSplit, DAY_ORDER, DAY_LABELS } from "@/data/workouts";
@@ -40,6 +43,7 @@ import {
   getLocalStorage,
   setLocalStorage
 } from "@/lib/store";
+import MusicPlayerCard from "@/components/music/MusicPlayerCard";
 
 const GOAL_META: Record<Goal, { label: string; icon: React.ReactNode }> = {
   cutting: { label: "Cutting", icon: <Minus size={14} /> },
@@ -246,6 +250,7 @@ function DashboardContent() {
           <span className="chip bg-lime/15 text-lime border border-lime/20 font-extrabold">
             {GOAL_META[profile.goal].icon}&nbsp;{GOAL_META[profile.goal].label}
           </span>
+          <ThemeToggleButton />
           <Link
             href="/settings"
             className="h-8.5 w-8.5 rounded-xl bg-white/5 border border-white/10 hover:border-lime/20 text-white/60 hover:text-lime flex items-center justify-center transition-all active:scale-90"
@@ -285,6 +290,9 @@ function DashboardContent() {
           </span>
         </div>
       </Link>
+
+      {/* Recommended Music Playlist Card */}
+      <MusicPlayerCard dayPlan={today} goal={profile.goal} />
 
       {/* ── PWA Daily Checklist Widget ── */}
       <div className="glass-card p-5 mb-5 animate-stagger-in stagger-2">
@@ -721,3 +729,31 @@ function AnimatedStatCard({
     </div>
   );
 }
+
+function ThemeToggleButton() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="h-8.5 w-8.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center" />
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
+
+  return (
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="h-8.5 w-8.5 rounded-xl bg-white/5 border border-white/10 hover:border-lime/20 text-white/60 hover:text-lime flex items-center justify-center transition-all active:scale-90"
+      title="Ganti Tema"
+    >
+      {isDark ? <Sun size={15} /> : <Moon size={15} />}
+    </button>
+  );
+}
+

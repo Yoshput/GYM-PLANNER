@@ -7,6 +7,7 @@ import BottomNav from "@/components/ui/BottomNav";
 import YosBot from "@/components/ui/YosBot";
 import { Dumbbell } from "lucide-react";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
+import IosInstallBanner from "@/components/ui/IosInstallBanner";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -76,6 +77,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       <BottomNav />
       <YosBot />
+      <IosInstallBanner />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import ServiceWorkerRegister from "@/components/ui/ServiceWorkerRegister";
 import { ToastProvider } from "@/components/ui/Toast";
 import SafariInstallBanner from "@/components/ui/SafariInstallBanner";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
 const interBody = Inter({
   subsets: ["latin"],
@@ -52,13 +53,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${interBody.variable} ${interTightDisplay.variable}`}>
+    <html lang="en" className={`${interBody.variable} ${interTightDisplay.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased min-h-screen">
-        <ToastProvider>
-          {children}
-        </ToastProvider>
-        <SafariInstallBanner />
-        <ServiceWorkerRegister />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+          <SafariInstallBanner />
+          <ServiceWorkerRegister />
+        </ThemeProvider>
       </body>
     </html>
   );

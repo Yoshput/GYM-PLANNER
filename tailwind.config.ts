@@ -10,10 +10,10 @@ const config: Config = {
     extend: {
       colors: {
         base: {
-          DEFAULT: "#0B0B0F",
-          card: "#121217",
-          raised: "#17171D",
-          border: "#232329",
+          DEFAULT: "var(--color-base)",
+          card: "var(--color-base-card)",
+          raised: "var(--color-base-raised)",
+          border: "var(--color-base-border)",
         },
         lime: {
           DEFAULT: "#CCFF00",
