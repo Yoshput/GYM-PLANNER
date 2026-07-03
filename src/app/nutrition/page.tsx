@@ -97,12 +97,6 @@ function NutritionContent() {
   const [cupsLogged, setCupsLogged] = useState(0);
   const [waterBump, setWaterBump] = useState(false);
 
-  const handleAddCup = useCallback(() => {
-    setCupsLogged((prev) => prev + 1);
-    setWaterBump(true);
-    setTimeout(() => setWaterBump(false), 350);
-  }, []);
-
   const [loggedKcal,    setLoggedKcal]    = useState(0);
   const [loggedProtein, setLoggedProtein] = useState(0);
   const [loggedCarbs,   setLoggedCarbs]   = useState(0);
@@ -112,6 +106,77 @@ function NutritionContent() {
   const [loggedSodium,  setLoggedSodium]  = useState(0);
   const [loggedMeals,   setLoggedMeals]   = useState<Set<string>>(new Set());
   const [recentLogs,    setRecentLogs]    = useState<any[]>([]);
+
+  // Daily persistence and sync to localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const todayKey = new Date().toDateString();
+    const storedDate = localStorage.getItem("gym-planner:nutrition:date");
+
+    if (storedDate !== todayKey) {
+      // New day, reset all values
+      localStorage.setItem("gym-planner:nutrition:date", todayKey);
+      localStorage.removeItem("gym-planner:nutrition:data");
+    } else {
+      const stored = localStorage.getItem("gym-planner:nutrition:data");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setCupsLogged(parsed.cupsLogged || 0);
+          setLoggedKcal(parsed.loggedKcal || 0);
+          setLoggedProtein(parsed.loggedProtein || 0);
+          setLoggedCarbs(parsed.loggedCarbs || 0);
+          setLoggedFat(parsed.loggedFat || 0);
+          setLoggedFiber(parsed.loggedFiber || 0);
+          setLoggedSugar(parsed.loggedSugar || 0);
+          setLoggedSodium(parsed.loggedSodium || 0);
+          setLoggedMeals(new Set(parsed.loggedMeals || []));
+          setRecentLogs(parsed.recentLogs || []);
+        } catch (e) {
+          console.error("Failed parsing nutrition data", e);
+        }
+      }
+    }
+  }, []);
+
+  const saveNutritionState = (updates: any) => {
+    if (typeof window === "undefined") return;
+    const todayKey = new Date().toDateString();
+    
+    // Read current state to merge
+    let current: any = {};
+    const stored = localStorage.getItem("gym-planner:nutrition:data");
+    if (stored) {
+      try { current = JSON.parse(stored); } catch {}
+    }
+
+    const merged = {
+      cupsLogged,
+      loggedKcal,
+      loggedProtein,
+      loggedCarbs,
+      loggedFat,
+      loggedFiber,
+      loggedSugar,
+      loggedSodium,
+      loggedMeals: Array.from(loggedMeals),
+      recentLogs,
+      ...updates
+    };
+
+    localStorage.setItem("gym-planner:nutrition:date", todayKey);
+    localStorage.setItem("gym-planner:nutrition:data", JSON.stringify(merged));
+  };
+
+  const handleAddCup = useCallback(() => {
+    setCupsLogged((prev) => {
+      const newVal = prev + 1;
+      saveNutritionState({ cupsLogged: newVal });
+      return newVal;
+    });
+    setWaterBump(true);
+    setTimeout(() => setWaterBump(false), 350);
+  }, [cupsLogged, loggedKcal, loggedProtein, loggedCarbs, loggedFat, loggedFiber, loggedSugar, loggedSodium, loggedMeals, recentLogs]);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -175,15 +240,38 @@ function NutritionContent() {
     const s = Math.round((activePortionFood.sugarG || 0) * factor * 10) / 10;
     const na = Math.round((activePortionFood.sodiumMg || 0) * factor);
 
-    setLoggedKcal(prev => prev + k);
-    setLoggedProtein(prev => prev + p);
-    setLoggedCarbs(prev => prev + c);
-    setLoggedFat(prev => prev + f);
-    setLoggedFiber(prev => prev + fi);
-    setLoggedSugar(prev => prev + s);
-    setLoggedSodium(prev => prev + na);
-    setLoggedMeals(prev => new Set([...prev, activePortionFood.name]));
-    setRecentLogs(prev => [{ name: `${activePortionFood.name} (${foodGramInput}g)`, kcal: k, p, c, f }, ...prev]);
+    const newKcal = loggedKcal + k;
+    const newP = loggedProtein + p;
+    const newC = loggedCarbs + c;
+    const newF = loggedFat + f;
+    const newFi = loggedFiber + fi;
+    const newS = loggedSugar + s;
+    const newNa = loggedSodium + na;
+    const newMeals = new Set([...loggedMeals, activePortionFood.name]);
+    const newLogs = [{ name: `${activePortionFood.name} (${foodGramInput}g)`, kcal: k, p, c, f }, ...recentLogs];
+
+    setLoggedKcal(newKcal);
+    setLoggedProtein(newP);
+    setLoggedCarbs(newC);
+    setLoggedFat(newF);
+    setLoggedFiber(newFi);
+    setLoggedSugar(newS);
+    setLoggedSodium(newNa);
+    setLoggedMeals(newMeals);
+    setRecentLogs(newLogs);
+
+    saveNutritionState({
+      loggedKcal: newKcal,
+      loggedProtein: newP,
+      loggedCarbs: newC,
+      loggedFat: newF,
+      loggedFiber: newFi,
+      loggedSugar: newS,
+      loggedSodium: newNa,
+      loggedMeals: Array.from(newMeals),
+      recentLogs: newLogs
+    });
+
     setActivePortionFood(null);
   };
 
@@ -196,9 +284,27 @@ function NutritionContent() {
     e.preventDefault();
     if (!customFoodName.trim()) return;
     const k = Number(customFoodKcal) || 0, p = Number(customFoodP) || 0, c = Number(customFoodC) || 0, f = Number(customFoodF) || 0;
-    setLoggedKcal(prev => prev + k); setLoggedProtein(prev => prev + p);
-    setLoggedCarbs(prev => prev + c); setLoggedFat(prev => prev + f);
-    setRecentLogs(prev => [{ name: customFoodName.trim(), kcal: k, p, c, f }, ...prev]);
+    
+    const newKcal = loggedKcal + k;
+    const newP = loggedProtein + p;
+    const newC = loggedCarbs + c;
+    const newF = loggedFat + f;
+    const newLogs = [{ name: customFoodName.trim(), kcal: k, p, c, f }, ...recentLogs];
+
+    setLoggedKcal(newKcal); 
+    setLoggedProtein(newP);
+    setLoggedCarbs(newC); 
+    setLoggedFat(newF);
+    setRecentLogs(newLogs);
+
+    saveNutritionState({
+      loggedKcal: newKcal,
+      loggedProtein: newP,
+      loggedCarbs: newC,
+      loggedFat: newF,
+      recentLogs: newLogs
+    });
+
     setCustomFoodName(""); setCustomFoodKcal(""); setCustomFoodP(""); setCustomFoodC(""); setCustomFoodF("");
     setShowCustomForm(false);
   };
@@ -206,18 +312,35 @@ function NutritionContent() {
   const handleRemoveLog = (index: number) => {
     const t = recentLogs[index];
     if (!t) return;
-    setLoggedKcal(prev => Math.max(0, prev - t.kcal));
-    setLoggedProtein(prev => Math.max(0, prev - t.p));
-    setLoggedCarbs(prev => Math.max(0, prev - t.c));
-    setLoggedFat(prev => Math.max(0, prev - t.f));
-    setLoggedMeals(prev => { const s = new Set(prev); s.delete(t.name.split(" (")[0]); return s; });
-    setRecentLogs(prev => prev.filter((_, i) => i !== index));
+
+    const newKcal = Math.max(0, loggedKcal - t.kcal);
+    const newP = Math.max(0, loggedProtein - t.p);
+    const newC = Math.max(0, loggedCarbs - t.c);
+    const newF = Math.max(0, loggedFat - t.f);
+    const newMeals = new Set(loggedMeals);
+    newMeals.delete(t.name.split(" (")[0]);
+    const newLogs = recentLogs.filter((_, i) => i !== index);
+
+    setLoggedKcal(newKcal);
+    setLoggedProtein(newP);
+    setLoggedCarbs(newC);
+    setLoggedFat(newF);
+    setLoggedMeals(newMeals);
+    setRecentLogs(newLogs);
+
+    saveNutritionState({
+      loggedKcal: newKcal,
+      loggedProtein: newP,
+      loggedCarbs: newC,
+      loggedFat: newF,
+      loggedMeals: Array.from(newMeals),
+      recentLogs: newLogs
+    });
   };
 
-  // ── AI Nutrition Scanner ──
   const getUserApiKey = () => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("yosbot-api-key") || localStorage.getItem("gemini-api-key") || "";
+      return localStorage.getItem("gym-planner:gemini-key") || localStorage.getItem("yosbot-api-key") || localStorage.getItem("gemini-api-key") || "";
     }
     return "";
   };
@@ -322,13 +445,31 @@ function NutritionContent() {
     const c = Math.round((aiResult.carbsG || 0) * 10) / 10;
     const f = Math.round((aiResult.fatG || 0) * 10) / 10;
     const fi = Math.round((aiResult.fiberG || 0) * 10) / 10;
-    setLoggedKcal(prev => prev + k);
-    setLoggedProtein(prev => prev + p);
-    setLoggedCarbs(prev => prev + c);
-    setLoggedFat(prev => prev + f);
-    setLoggedFiber(prev => prev + fi);
+
+    const newKcal = loggedKcal + k;
+    const newP = loggedProtein + p;
+    const newC = loggedCarbs + c;
+    const newF = loggedFat + f;
+    const newFi = loggedFiber + fi;
     const label = `${aiResult.name} (${aiResult.estimatedGram}g) [AI]`;
-    setRecentLogs(prev => [{ name: label, kcal: k, p, c, f }, ...prev]);
+    const newLogs = [{ name: label, kcal: k, p, c, f }, ...recentLogs];
+
+    setLoggedKcal(newKcal);
+    setLoggedProtein(newP);
+    setLoggedCarbs(newC);
+    setLoggedFat(newF);
+    setLoggedFiber(newFi);
+    setRecentLogs(newLogs);
+
+    saveNutritionState({
+      loggedKcal: newKcal,
+      loggedProtein: newP,
+      loggedCarbs: newC,
+      loggedFat: newF,
+      loggedFiber: newFi,
+      recentLogs: newLogs
+    });
+
     setAiResult(null);
     setAiQuery("");
     setShowAIScanner(false);

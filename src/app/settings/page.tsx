@@ -205,12 +205,46 @@ function SettingsContent() {
         </div>
 
         {/* Language */}
-        <div className="flex items-center justify-between py-2">
+        <div className="flex items-center justify-between py-2 border-b border-white/5">
           <div>
             <p className="text-sm font-bold text-white/90">Bahasa Aplikasi</p>
             <p className="text-[10px] text-white/35">Bahasa default sistem</p>
           </div>
           <span className="text-xs text-white/50 font-bold uppercase">Bahasa Indonesia</span>
+        </div>
+
+        {/* Gemini API Key */}
+        <div className="py-2 space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-bold text-white/90 flex items-center gap-1"><Key size={14} className="text-lime" /> Gemini API Key</p>
+              <p className="text-[10px] text-white/35">API key kustom untuk YosBot & AI Scan</p>
+            </div>
+            {customKey && (
+              <span className="chip bg-lime/10 text-lime border border-lime/20 text-[9px] py-1">Tersimpan</span>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="password"
+              placeholder="Masukkan API Key Gemini Anda"
+              value={customKey}
+              onChange={(e) => setCustomKey(e.target.value)}
+              className="flex-1 bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+            />
+            <button
+              onClick={() => {
+                localStorage.setItem("gym-planner:gemini-key", customKey.trim());
+                showToast("Kunci Disimpan 🔑", {
+                  sub: "Gemini API Key kustom telah disimpan.",
+                  variant: "success",
+                });
+              }}
+              className="px-4 py-2 rounded-xl bg-lime text-black text-xs font-bold hover:scale-98 active:scale-95 transition-transform"
+            >
+              Simpan
+            </button>
+          </div>
         </div>
       </div>
 

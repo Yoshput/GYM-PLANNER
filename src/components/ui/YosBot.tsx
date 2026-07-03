@@ -113,7 +113,6 @@ export default function YosBot() {
           aria-label="Tanya YosBot AI"
         >
           <MessageSquare size={24} className="text-base group-hover:rotate-6 transition-transform" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border border-base animate-pulse" />
         </button>
       )}
 

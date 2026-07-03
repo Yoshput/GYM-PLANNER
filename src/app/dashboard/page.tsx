@@ -574,10 +574,29 @@ function DashboardContent() {
 
       {/* ── Weekly split ── */}
       <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-3">Jadwal Split Mingguan</p>
-      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-2 mb-6 animate-stagger-in stagger-4">
+      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-2 mb-3 animate-stagger-in stagger-4">
         {DAY_ORDER.map((day) => {
           const plan = split[day];
           const isToday = day === todayKey;
+          
+          // Check if user completed any exercises for this specific day of the split
+          // We look for logs corresponding to this day in the current week cycle
+          const hasLoggedToday = logs.some((log: any) => {
+            // Match logs with the target day of the week
+            const logDay = new Date(log.date).getDay();
+            const targetDayIdx = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"].indexOf(day);
+            return logDay === targetDayIdx;
+          });
+
+          let dotClass = "bg-white/10"; // Default Rest
+          if (hasLoggedToday) {
+            dotClass = "bg-lime shadow-[0_0_8px_rgba(204,255,0,0.6)]"; // Completed
+          } else if (isToday && !plan.isRestDay) {
+            dotClass = "bg-ember animate-pulse shadow-[0_0_8px_rgba(255,69,0,0.6)]"; // Today active (not completed)
+          } else if (!plan.isRestDay) {
+            dotClass = "bg-white/30 border border-white/10"; // Upcoming/scheduled
+          }
+
           return (
             <Link
               key={day}
@@ -591,17 +610,33 @@ function DashboardContent() {
               <span className={`text-[10px] font-bold uppercase ${isToday ? "text-lime" : "text-white/35"}`}>
                 {DAY_LABELS[day].slice(0, 3)}
               </span>
-              <span
-                className={`h-2 w-2 rounded-full transition-all ${
-                  plan.isRestDay ? "bg-white/15" : isToday ? "bg-lime shadow-[0_0_8px_rgba(204,255,0,0.6)]" : "bg-ember/50"
-                }`}
-              />
+              <span className={`h-2.5 w-2.5 rounded-full transition-all ${dotClass}`} />
               <span className="text-[10px] text-white/45 text-center leading-tight px-1">
                 {plan.isRestDay ? "Rest" : plan.label.split(" ")[0]}
               </span>
             </Link>
           );
         })}
+      </div>
+
+      {/* Legend for Split Colors */}
+      <div className="flex flex-wrap gap-x-4 gap-y-2 mb-6 px-1 animate-stagger-in stagger-4 text-[10px] uppercase tracking-wider font-bold text-white/35">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-lime shadow-[0_0_6px_rgba(204,255,0,0.4)]" />
+          <span>Selesai</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-ember animate-pulse shadow-[0_0_6px_rgba(255,69,0,0.4)]" />
+          <span>Hari Ini</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-white/30" />
+          <span>Terjadwal</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-white/10" />
+          <span>Istirahat</span>
+        </div>
       </div>
 
       {/* ── Workout history logs logger ── */}

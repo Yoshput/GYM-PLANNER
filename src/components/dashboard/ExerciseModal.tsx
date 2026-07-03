@@ -463,7 +463,9 @@ export default function ExerciseModal({ exercise, dayKey, onClose }: ExerciseMod
                         {setData.completed && <Check size={12} className="stroke-[3]" />}
                       </button>
                       <span className="font-display font-black text-sm text-white/85">
-                        {setData.isWarmup ? `Warm-up Set ${index + 1}` : `Set ${setsData.filter((s, idx) => !s.isWarmup || idx < index).length + 1}`}
+                        {setData.isWarmup 
+                          ? `Warm-up Set ${index + 1}` 
+                          : `Set ${setsData.slice(0, index).filter((s) => !s.isWarmup).length + 1}`}
                       </span>
                     </div>
 
