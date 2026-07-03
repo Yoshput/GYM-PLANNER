@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, Upload, Trash2, ArrowLeft, RefreshCw, Smartphone, Key, ToggleLeft, Globe, Eye, Settings as SettingsIcon } from "lucide-react";
+import { Download, Upload, Trash2, ArrowLeft, RefreshCw, Smartphone, Key, ToggleLeft, Globe, Eye, Settings as SettingsIcon, MessageSquare, Info, Send, Terminal } from "lucide-react";
 import Link from "next/link";
 import AppShell from "@/components/ui/AppShell";
 import { useToast } from "@/components/ui/Toast";
@@ -23,6 +23,11 @@ function SettingsContent() {
   const [metricUnit, setMetricUnit] = useState(true);
   const [offlineMode, setOfflineMode] = useState(true);
   const [customKey, setCustomKey] = useState("");
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackContact, setFeedbackContact] = useState("");
+  const [feedbackType, setFeedbackType] = useState("saran");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -30,6 +35,53 @@ function SettingsContent() {
       setCustomKey(localStorage.getItem("gym-planner:gemini-key") || "");
     }
   }, []);
+
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!feedbackText.trim()) return;
+
+    setSubmittingFeedback(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from("feedbacks").insert([
+        {
+          contact: feedbackContact || "Anonim",
+          content: feedbackText,
+          type: feedbackType,
+          created_at: new Date().toISOString(),
+        }
+      ]);
+
+      if (error) throw error;
+
+      showToast("Saran Terkirim 🚀", {
+        sub: "Terima kasih! Masukan Anda sangat berharga bagi pengembangan.",
+        variant: "success",
+      });
+      setFeedbackText("");
+      setFeedbackContact("");
+    } catch (err: any) {
+      console.warn("Saving feedback to local fallback:", err);
+      const savedFeedbacks = JSON.parse(localStorage.getItem("gym-planner:pending-feedback") || "[]");
+      savedFeedbacks.push({
+        contact: feedbackContact || "Anonim",
+        content: feedbackText,
+        type: feedbackType,
+        date: new Date().toISOString(),
+      });
+      localStorage.setItem("gym-planner:pending-feedback", JSON.stringify(savedFeedbacks));
+
+      showToast("Tersimpan Lokal 💾", {
+        sub: "Terkirim & disimpan lokal untuk sinkronisasi berikutnya.",
+        variant: "success",
+      });
+      setFeedbackText("");
+      setFeedbackContact("");
+    } finally {
+      setSubmittingFeedback(false);
+    }
+  };
+
 
   const handleUnitToggle = () => {
     const newVal = !metricUnit;
@@ -291,6 +343,106 @@ function SettingsContent() {
             </div>
           </div>
         </button>
+      </div>
+
+      {/* Beta Mode & Feedback Form */}
+      <div className="glass-card p-5 mb-5 space-y-4">
+        <div className="flex items-start gap-2.5 bg-lime/10 border border-lime/25 rounded-xl p-3">
+          <Info size={16} className="text-lime shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-xs font-bold text-white uppercase tracking-wider">Aplikasi Dalam Pengembangan 🚀</p>
+            <p className="text-[10px] text-white/60 leading-relaxed">
+              Gym Planner ini sedang dikembangkan secara aktif oleh <strong>Yossika dari Sokaraja</strong>. Jika Anda mengalami kendala, error, atau memiliki saran fitur baru, silakan kirimkan masukan di formulir bawah ini.
+            </p>
+          </div>
+        </div>
+
+        {/* Suggestion / Feedback Form */}
+        <form onSubmit={handleSubmitFeedback} className="space-y-3 pt-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-white/35">Kirim Saran & Masukan</p>
+          
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              placeholder="Nama atau Email (Opsional)"
+              value={feedbackContact}
+              onChange={(e) => setFeedbackContact(e.target.value)}
+              className="bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+            />
+            <select
+              value={feedbackType}
+              onChange={(e) => setFeedbackType(e.target.value)}
+              className="bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+            >
+              <option value="saran">💡 Saran Fitur</option>
+              <option value="bug">🐛 Laporan Error</option>
+              <option value="tanya">❓ Pertanyaan</option>
+            </select>
+          </div>
+
+          <textarea
+            placeholder="Tuliskan saran atau deskripsi error yang Anda alami..."
+            value={feedbackText}
+            onChange={(e) => setFeedbackText(e.target.value)}
+            required
+            rows={3}
+            className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 resize-none"
+          />
+
+          <button
+            type="submit"
+            disabled={submittingFeedback}
+            className="w-full py-2.5 rounded-xl bg-lime text-black text-xs font-bold hover:scale-98 active:scale-95 transition-transform flex items-center justify-center gap-1.5 disabled:opacity-50"
+          >
+            {submittingFeedback ? (
+              <>Mengirim...</>
+            ) : (
+              <>
+                <Send size={12} /> Kirim Masukan
+              </>
+            )}
+          </button>
+        </form>
+      </div>
+
+      {/* Release Notes Changelog */}
+      <div className="glass-card p-5 mb-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold uppercase tracking-widest text-white/35">Informasi Versi & Rilis</p>
+          <span className="chip bg-lime/10 text-lime border border-lime/20 text-[9px] py-1">v1.5.0 PWA</span>
+        </div>
+        <button
+          onClick={() => setShowChangelog(!showChangelog)}
+          className="w-full flex items-center justify-between py-2 px-3 rounded-xl bg-white/3 hover:bg-lime/5 border border-white/5 hover:border-lime/25 text-left text-white/80 hover:text-lime transition-all active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-2">
+            <Terminal size={14} />
+            <span className="text-xs font-bold">Lihat Catatan Rilis & Log Update</span>
+          </div>
+          <span className="text-[10px] text-white/40 underline">Lihat</span>
+        </button>
+
+        {showChangelog && (
+          <div className="space-y-3 pt-3 border-t border-white/5 text-[11px] leading-relaxed text-white/70 animate-fade-in">
+            <div className="space-y-1">
+              <p className="font-bold text-lime">Update Terbaru v1.5.0 (PWA & Musik):</p>
+              <ul className="list-disc list-inside space-y-1 pl-1 text-[10px] text-white/60">
+                <li>Integrasi pemutar musik YouTube IFrame kustom di dashboard.</li>
+                <li>Banner petunjuk instalasi PWA interaktif untuk iOS Safari.</li>
+                <li>Dukungan cross-platform dynamic viewport dynamic height (100dvh).</li>
+                <li>Tampilan Light Mode baru bertema gradasi ambient premium.</li>
+              </ul>
+            </div>
+            <div className="space-y-1">
+              <p className="font-bold text-white/90">Versi v1.4.0 (Gemini AI Key):</p>
+              <ul className="list-disc list-inside space-y-1 pl-1 text-[10px] text-white/55">
+                <li>Input Gemini API key kustom di Pengaturan untuk YosBot & AI Scan.</li>
+                <li>Konsistensi widget split latihan mingguan dengan legend status lengkap.</li>
+                <li>Penghitungan streak latihan dinamis bebas rest day.</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer info */}
