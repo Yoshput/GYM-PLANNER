@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { UserProfile } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 
@@ -12,14 +12,32 @@ interface UseProfileResult {
   updateProfile: (updated: Partial<UserProfile>) => Promise<boolean>;
 }
 
-export function useProfile(): UseProfileResult {
+const ProfileContext = createContext<UseProfileResult | undefined>(undefined);
+
+export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
   const supabase = createClient();
 
+  // Load from localStorage immediately on mount to prevent loading flickers
+  useEffect(() => {
+    try {
+      const cachedProfile = window.localStorage.getItem("gym-planner:profile");
+      const cachedUserId = window.localStorage.getItem("gym-planner:userId");
+      
+      if (cachedProfile && cachedUserId) {
+        setProfile(JSON.parse(cachedProfile));
+        setIsAuthenticated(true);
+        setIsLoading(false); // Stop loading immediately since we have cached data!
+      }
+    } catch (e) {
+      console.error("[ProfileProvider] Error loading initial cache:", e);
+    }
+  }, []);
+
   const refresh = useCallback(async () => {
-    setIsLoading(true);
     try {
       const {
         data: { session },
@@ -29,6 +47,12 @@ export function useProfile(): UseProfileResult {
         setProfile(null);
         setIsAuthenticated(false);
         setIsLoading(false);
+        setHasLoadedInitial(true);
+        // Clear local storage if session is lost
+        try {
+          window.localStorage.removeItem("gym-planner:profile");
+          window.localStorage.removeItem("gym-planner:userId");
+        } catch {}
         return;
       }
 
@@ -40,31 +64,15 @@ export function useProfile(): UseProfileResult {
         .eq("id", session.user.id)
         .single();
 
-      // Check localStorage - but ONLY if it belongs to the current user
-      let localProfile: any = null;
-      try {
-        const raw = window.localStorage.getItem("gym-planner:profile");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          // Only use localStorage if it matches current user (has userId field matching)
-          // or if there's no userId field stored (legacy - first time migration only)
-          const storedUserId = window.localStorage.getItem("gym-planner:userId");
-          if (!storedUserId || storedUserId === session.user.id) {
-            localProfile = parsed;
-          } else {
-            // Different user's data - clear all localStorage to prevent contamination
-            console.log("[useProfile] Clearing stale localStorage from different user");
-            window.localStorage.clear();
-          }
-        }
-      } catch {}
-
       if (error || !dbProfile || !dbProfile.goal) {
-        // New user with no DB profile → show onboarding (do NOT sync stale local data)
+        // No profile in DB, onboarding required
         setProfile(null);
+        try {
+          window.localStorage.removeItem("gym-planner:profile");
+          window.localStorage.removeItem("gym-planner:userId");
+        } catch {}
       } else {
-        // Map database fields to UserProfile
-        // Also store current userId in localStorage to detect user switches
+        // Save current userId and profile to localStorage
         try {
           window.localStorage.setItem("gym-planner:userId", session.user.id);
         } catch {}
@@ -85,14 +93,17 @@ export function useProfile(): UseProfileResult {
           trainingDays: dbProfile.training_days ? Number(dbProfile.training_days) : 3,
           trainingStyle: (dbProfile.training_style as any) || "auto",
         };
-        
+
         setProfile(mappedProfile);
+        try {
+          window.localStorage.setItem("gym-planner:profile", JSON.stringify(mappedProfile));
+        } catch {}
       }
-    } catch {
-      setProfile(null);
-      setIsAuthenticated(false);
+    } catch (e) {
+      console.error("[ProfileProvider] Error refreshing profile:", e);
     } finally {
       setIsLoading(false);
+      setHasLoadedInitial(true);
     }
   }, [supabase]);
 
@@ -103,6 +114,17 @@ export function useProfile(): UseProfileResult {
       } = await supabase.auth.getSession();
 
       if (!session?.user) return false;
+
+      // Optimistically update local state & cache first to make it instant
+      let newProfile: UserProfile | null = null;
+      setProfile((prev) => {
+        if (!prev) return null;
+        newProfile = { ...prev, ...updated };
+        try {
+          window.localStorage.setItem("gym-planner:profile", JSON.stringify(newProfile));
+        } catch {}
+        return newProfile;
+      });
 
       // Map back to database columns
       const dbData: any = {};
@@ -130,7 +152,9 @@ export function useProfile(): UseProfileResult {
         });
 
       if (error) throw error;
-      await refresh();
+      
+      // Background re-fetch to ensure sync
+      refresh();
       return true;
     } catch (e) {
       console.error("Error updating profile:", e);
@@ -138,9 +162,34 @@ export function useProfile(): UseProfileResult {
     }
   };
 
+  // Run initial refresh in background on mount
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  return { profile, isLoading, isAuthenticated, refresh, updateProfile };
+  // To prevent the onboarding modal from showing during the split-second initial load,
+  // we keep isLoading true until we have completed at least the first background check OR loaded from cache.
+  const resolvedLoading = isLoading && !profile && !hasLoadedInitial;
+
+  return (
+    <ProfileContext.Provider
+      value={{
+        profile,
+        isLoading: resolvedLoading,
+        isAuthenticated,
+        refresh,
+        updateProfile,
+      }}
+    >
+      {children}
+    </ProfileContext.Provider>
+  );
+}
+
+export function useProfile(): UseProfileResult {
+  const context = useContext(ProfileContext);
+  if (context === undefined) {
+    throw new Error("useProfile must be used within a ProfileProvider");
+  }
+  return context;
 }

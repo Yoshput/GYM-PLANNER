@@ -5,6 +5,7 @@ import ServiceWorkerRegister from "@/components/ui/ServiceWorkerRegister";
 import { ToastProvider } from "@/components/ui/Toast";
 import SafariInstallBanner from "@/components/ui/SafariInstallBanner";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { ProfileProvider } from "@/lib/useProfile";
 
 const interBody = Inter({
   subsets: ["latin"],
@@ -73,7 +74,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-body antialiased min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <ToastProvider>
-            {children}
+            <ProfileProvider>
+              {children}
+            </ProfileProvider>
           </ToastProvider>
           <SafariInstallBanner />
           <ServiceWorkerRegister />
