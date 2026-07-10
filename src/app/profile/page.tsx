@@ -137,9 +137,9 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4 mb-6">
             <div className="relative group shrink-0">
               <label className="block cursor-pointer">
-                <div className="h-16 w-16 rounded-full bg-lime/10 border border-lime/20 flex items-center justify-center text-lime overflow-hidden relative">
+                <div className="h-16 w-16 rounded-full bg-lime/10 border border-lime/20 flex items-center justify-center text-lime overflow-hidden relative" style={{ height: '64px', width: '64px', minWidth: '64px', minHeight: '64px' }}>
                   {profile?.profileImage ? (
-                    <img src={profile.profileImage} alt="Profile" className="h-full w-full object-cover" />
+                    <img src={profile.profileImage} alt="Profile" className="object-cover" style={{ height: '64px', width: '64px', display: 'block' }} />
                   ) : (
                     <User size={32} />
                   )}

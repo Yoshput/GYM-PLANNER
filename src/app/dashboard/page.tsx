@@ -258,11 +258,12 @@ function DashboardContent() {
           </Link>
           <Link
             href="/profile"
-            className="h-8.5 w-8.5 rounded-full overflow-hidden border border-white/10 hover:border-lime/20 flex items-center justify-center bg-lime/10 text-lime shrink-0"
+            className="h-9 w-9 min-h-9 min-w-9 rounded-full overflow-hidden border border-white/10 hover:border-lime/20 flex items-center justify-center bg-lime/10 text-lime shrink-0"
             title="Profil Saya"
+            style={{ height: '36px', width: '36px', minHeight: '36px', minWidth: '36px' }}
           >
             {profile.profileImage ? (
-              <img src={profile.profileImage} alt={profile.name} className="h-full w-full object-cover" />
+              <img src={profile.profileImage} alt={profile.name} className="object-cover" style={{ height: '36px', width: '36px', display: 'block', flexShrink: 0 }} />
             ) : (
               <User size={14} />
             )}
