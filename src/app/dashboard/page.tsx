@@ -230,7 +230,7 @@ function DashboardContent() {
   };
 
   return (
-    <main className="px-5 pt-safe pt-8 pb-6 max-w-md mx-auto">
+    <main className="px-4 sm:px-6 lg:px-8 pt-safe pt-6 lg:pt-10 pb-6 max-w-2xl mx-auto">
       {/* ── Personalized Header ── */}
       <div className="flex items-center justify-between mb-4 animate-slide-down-fade">
         <div>
@@ -238,7 +238,7 @@ function DashboardContent() {
             <Calendar size={12} className="text-lime" />
             {new Date().toLocaleDateString("id-ID", { weekday: "long", month: "short", day: "numeric" })}
           </p>
-          <h1 className="heading-brutal text-3xl">
+          <h1 className="heading-brutal text-3xl lg:text-4xl">
             Halo, <span className="text-gradient-lime">{profile.name}</span>! 🔥
           </h1>
         </div>
@@ -272,7 +272,7 @@ function DashboardContent() {
       </div>
 
       {/* Motivational Quote Banner */}
-      <div className="glass-card px-4 py-3 mb-5 border-white/5 bg-white/1 flex items-center gap-2.5 rounded-xl animate-fade-in">
+      <div className="glass-card px-4 py-3 lg:px-6 lg:py-4 mb-5 border-white/5 bg-white/1 flex items-center gap-2.5 rounded-2xl animate-fade-in">
         <Sparkles size={14} className="text-lime shrink-0 animate-pulse" />
         <p className="text-[11px] text-white/60 italic leading-relaxed font-medium">
           &ldquo;{dailyQuote}&rdquo;
@@ -282,7 +282,7 @@ function DashboardContent() {
       {/* ── Today's focus card — shimmer border ── */}
       <Link
         href="/workout"
-        className="shimmer-border glass-card block p-5 mb-5 relative overflow-hidden active:scale-[0.98] transition-transform animate-stagger-in stagger-1"
+        className="shimmer-border glass-card block p-5 lg:p-6 mb-5 relative overflow-hidden rounded-2xl active:scale-[0.98] transition-transform animate-stagger-in stagger-1"
       >
         <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-lime/12 blur-2xl" aria-hidden="true" />
         <div className="absolute right-4 top-4 h-16 w-16 rounded-full bg-ember/8 blur-xl" aria-hidden="true" />
@@ -305,7 +305,7 @@ function DashboardContent() {
       <MusicPlayerCard dayPlan={today} goal={profile.goal} />
 
       {/* ── PWA Daily Checklist Widget ── */}
-      <div className="glass-card p-5 mb-5 animate-stagger-in stagger-2">
+      <div className="glass-card p-5 lg:p-6 mb-5 rounded-2xl animate-stagger-in stagger-2">
         <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-4 flex items-center justify-between">
           <span>Target Checklist Harian</span>
           <span className="text-lime text-[10px] font-extrabold">PROGRESS KONSISTENSI</span>
@@ -348,7 +348,7 @@ function DashboardContent() {
       </div>
 
       {/* ── Recovery Score Widget ── */}
-      <div className="glass-card p-5 mb-5 animate-stagger-in stagger-2 relative overflow-hidden">
+      <div className="glass-card p-5 lg:p-6 mb-5 rounded-2xl animate-stagger-in stagger-2 relative overflow-hidden">
         <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-4">Skor Pemulihan Harian</p>
         {todayLog ? (
           <div className="flex items-center gap-5">
@@ -469,14 +469,14 @@ function DashboardContent() {
       )}
 
       {/* ── Quick stats ── */}
-      <div className="grid grid-cols-3 gap-3 mb-5 animate-stagger-in stagger-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 mb-5 animate-stagger-in stagger-2">
         <AnimatedStatCard icon={<Scale size={18} />} label="BMI" value={bmi.toFixed(1)} sub={bmiCategory(bmi)} />
         <AnimatedStatCard icon={<Flame size={18} />} label="TDEE" value={macros.tdee} sub="kcal/hari" />
         <AnimatedStatCard icon={<Target size={18} />} label="Volume" value={totalVolumeThisWeek} sub="kg minggu ini" />
       </div>
 
       {/* ── Workout Calendar dot grid ── */}
-      <div className="glass-card p-4 mb-5 animate-stagger-in stagger-3">
+      <div className="glass-card p-4 lg:p-6 mb-5 rounded-2xl animate-stagger-in stagger-3">
         <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-3 flex items-center justify-between">
           <span>Aktivitas 7 Hari Terakhir</span>
           <span className="text-[10px] text-white/20">RIWAYAT AKTIF</span>
@@ -505,7 +505,7 @@ function DashboardContent() {
       </div>
 
       {/* ── Dynamic Achievement Badges Widget ── */}
-      <div className="glass-card p-5 mb-6 animate-stagger-in stagger-3">
+      <div className="glass-card p-5 lg:p-6 mb-6 rounded-2xl animate-stagger-in stagger-3">
         <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-4 flex items-center justify-between">
           <span>Lencana Pencapaian (Badges)</span>
           <span className="text-[10px] text-lime font-extrabold flex items-center gap-1"><Award size={11} /> PRESTASI</span>
@@ -602,7 +602,7 @@ function DashboardContent() {
       </div>
 
       {/* ── Workout history logs logger ── */}
-      <div className="glass-card p-5 mb-6 animate-stagger-in stagger-4">
+      <div className="glass-card p-5 lg:p-6 mb-6 rounded-2xl animate-stagger-in stagger-4">
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs font-bold uppercase tracking-widest text-white/35 flex items-center gap-1.5">
             <History size={13} className="text-lime" /> Riwayat Latihan Terakhir
@@ -675,7 +675,7 @@ function AnimatedStatCard({
   const display = isDecimal ? value : counted.toLocaleString();
 
   return (
-    <div className="glass-card flex flex-col gap-1 p-4 hover:border-lime/15 transition-colors duration-300">
+    <div className="glass-card flex flex-col gap-1 p-4 lg:p-6 rounded-2xl hover:border-lime/15 transition-colors duration-300">
       <div className="text-lime mb-1">{icon}</div>
       <span className="font-display font-extrabold text-lg leading-none animate-count-up">{display}</span>
       <span className="text-[10px] uppercase tracking-wide text-white/35">{label}</span>

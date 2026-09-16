@@ -67,7 +67,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center px-4 relative overflow-hidden bg-[#0A0A0E]">
+    <main className="min-h-[100dvh] flex flex-col justify-center items-center px-4 relative overflow-hidden bg-[#0A0A0E]">
       {/* Background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute inset-0 bg-grid-dots opacity-40" />
@@ -75,54 +75,54 @@ export default function LoginPage() {
         <div className="absolute bottom-20 -left-20 h-96 w-96 rounded-full bg-ember/10 blur-[120px]" />
       </div>
 
-      <div className="w-full max-w-md relative z-10 animate-scale-in">
+      <div className="w-full max-w-sm lg:max-w-md relative z-10 animate-scale-in">
         {/* Back */}
-        <div className="mb-6">
+        <div className="mb-6 lg:mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-white/40 hover:text-white/80 text-xs uppercase tracking-widest font-bold transition-colors group"
+            className="inline-flex items-center gap-2 text-white/40 hover:text-white/80 text-xs uppercase tracking-widest font-bold transition-colors group p-2 -ml-2"
           >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             Kembali ke Beranda
           </Link>
         </div>
 
         {/* Brand */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="h-12 w-12 rounded-2xl bg-lime flex items-center justify-center shadow-[0_0_30px_rgba(204,255,0,0.4)] mb-4">
-            <Dumbbell size={24} className="text-base" strokeWidth={2.5} />
+        <div className="flex flex-col items-center mb-8 lg:mb-10">
+          <div className="h-14 w-14 lg:h-16 lg:w-16 rounded-3xl bg-lime flex items-center justify-center shadow-[0_0_30px_rgba(204,255,0,0.4)] mb-5">
+            <Dumbbell size={28} className="text-base lg:scale-110" strokeWidth={2.5} />
           </div>
-          <h1 className="font-display font-black text-2xl uppercase tracking-wider text-white">
+          <h1 className="font-display font-black text-3xl lg:text-4xl uppercase tracking-wider text-white">
             YosFit <span className="text-gradient-lime">AI</span>
           </h1>
-          <p className="text-white/40 text-xs uppercase tracking-widest mt-1">Masuk ke Akun Anda</p>
+          <p className="text-white/40 text-xs lg:text-sm uppercase tracking-widest mt-2">Masuk ke Akun Anda</p>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-6 sm:p-8 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="glass-card p-6 sm:p-8 lg:p-10 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[2rem]">
           {error && (
-            <div className="bg-ember/10 border border-ember/20 rounded-xl p-3.5 mb-5 flex items-start gap-2.5">
-              <AlertCircle size={16} className="text-ember shrink-0 mt-0.5" />
-              <p className="text-xs text-white/80 leading-normal">{error}</p>
+            <div className="bg-ember/10 border border-ember/20 rounded-xl p-4 mb-6 flex items-start gap-3">
+              <AlertCircle size={18} className="text-ember shrink-0 mt-0.5" />
+              <p className="text-sm text-white/80 leading-normal">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             {/* Username or Email */}
             <div>
-              <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">
+              <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">
                 Username atau Email
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
-                  <User size={14} />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
+                  <User size={16} />
                 </span>
                 <input
                   type="text"
                   placeholder="username atau email@contoh.com"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 pl-8 pr-3 text-sm text-white focus:outline-none focus:border-lime/45 transition-colors placeholder-white/20"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 pl-11 pr-4 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors placeholder-white/20 min-h-[48px]"
                   required
                   autoComplete="username"
                 />
@@ -131,22 +131,22 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Password</label>
+              <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Masukkan password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 pl-3 pr-10 text-sm text-white focus:outline-none focus:border-lime/45 transition-colors placeholder-white/20"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 pl-4 pr-12 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors placeholder-white/20 min-h-[48px]"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors p-2"
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
@@ -154,11 +154,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary py-3 text-sm font-extrabold hover:scale-102 active:scale-98 transition-all flex items-center justify-center gap-2"
+              className="w-full btn-primary min-h-[52px] rounded-full text-[15px] font-extrabold hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   {isEmail(identifier) ? "Memproses..." : "Mencari akun..."}
                 </>
               ) : (
@@ -167,10 +167,10 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center border-t border-white/5 pt-5">
-            <p className="text-xs text-white/40">
+          <div className="mt-8 text-center border-t border-white/10 pt-6">
+            <p className="text-sm text-white/40">
               Belum punya akun?{" "}
-              <Link href="/signup" className="text-lime font-bold hover:underline">
+              <Link href="/signup" className="text-lime font-bold hover:underline p-1">
                 Daftar Baru
               </Link>
             </p>

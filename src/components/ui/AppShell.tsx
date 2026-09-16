@@ -28,14 +28,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0B0B0F]">
         <div className="flex flex-col items-center gap-3 animate-fade-in">
-          <div className="relative">
-            <div className="h-14 w-14 rounded-2xl bg-lime/10 border border-lime/20 flex items-center justify-center animate-glow-pulse-lime">
-              <Dumbbell size={24} className="text-lime" />
+          {/* iOS-style minimal spinner */}
+          <div className="relative h-12 w-12">
+            <div className="h-12 w-12 rounded-full border-[3px] border-white/10 border-t-lime animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Dumbbell size={16} className="text-lime" />
             </div>
-            {/* Spinning ring */}
-            <div className="absolute inset-0 rounded-2xl border-2 border-transparent border-t-lime/50 animate-spin" style={{ borderRadius: "1rem" }} />
           </div>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Loading</p>
+          <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Loading</p>
         </div>
       </div>
     );
@@ -55,27 +55,41 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative min-h-screen pb-24 overflow-x-hidden">
-      {/* ── Animated background layer ── */}
+    <div className="relative min-h-screen overflow-x-hidden">
+      {/* ── Animated background layer (fixed, out of flow) ── */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-        {/* Grid dot pattern */}
         <div className="absolute inset-0 bg-grid-dots opacity-60" />
-        {/* Floating orb — lime top-left */}
         <div className="absolute -top-32 -left-32 h-72 w-72 rounded-full bg-lime/8 blur-[80px] animate-float" />
-        {/* Floating orb — ember top-right */}
         <div className="absolute -top-16 -right-24 h-64 w-64 rounded-full bg-ember/7 blur-[70px] animate-float-reverse" />
-        {/* Floating orb — lime bottom-right */}
         <div className="absolute bottom-24 -right-20 h-56 w-56 rounded-full bg-lime/5 blur-[80px] animate-float" style={{ animationDelay: "2s" }} />
-        {/* Subtle center glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-lime/3 blur-[120px]" />
       </div>
 
-      {/* ── Content ── */}
-      <div className="relative animate-fade-in">
-        {children}
+      {/* ── Layout: flexbox for sidebar + content ── */}
+      {/*
+        BottomNav renders a React Fragment containing:
+        1. <nav> — mobile bottom nav (hidden on lg)
+        2. <aside> — desktop sidebar (hidden on mobile, flex on lg)
+
+        On desktop: the <aside> acts as the sidebar column (w-[280px] sticky).
+        The content div takes flex-1 and shifts right accordingly.
+      */}
+      <div className="relative flex min-h-screen">
+        {/* Sidebar lives here (BottomNav renders it as the <aside> on lg) */}
+        <BottomNav />
+
+        {/* ── Main content column ── */}
+        <main
+          className="flex-1 min-w-0 pb-28 lg:pb-8 animate-fade-in"
+          style={{ minWidth: 0 }}
+        >
+          {/* Center content on desktop, full-width on mobile */}
+          <div className="max-w-2xl mx-auto w-full">
+            {children}
+          </div>
+        </main>
       </div>
 
-      <BottomNav />
       <YosBot />
       <IosInstallBanner />
     </div>

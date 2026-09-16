@@ -191,7 +191,7 @@ function WorkoutContent() {
   const dayPlan = customSplit[activeDay];
 
   return (
-    <main className="pt-safe pt-8 pb-6 max-w-md mx-auto">
+    <main className="px-4 sm:px-6 lg:px-8 pt-safe pt-6 pb-6 max-w-2xl mx-auto">
       {/* ── Header ── */}
       <div className="px-5 mb-5 flex justify-between items-end animate-slide-down-fade">
         <div>
@@ -221,7 +221,7 @@ function WorkoutContent() {
       </div>
 
       {/* ── Day tabs ── */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-none px-5 pb-4 mb-2">
+      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap mb-2">
         {DAY_ORDER.map((day) => {
           const active = day === activeDay;
           const isToday = day === getTodayKey();
@@ -299,7 +299,7 @@ function WorkoutContent() {
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
             {dayPlan.exercises.map((exercise, idx) => (
               <div 
                 key={exercise.id} 
@@ -343,7 +343,7 @@ function WorkoutContent() {
                     if (isEditing) setEditingExercise(exercise);
                     else setActiveExercise(exercise);
                   }}
-                  className={`flex-1 glass-card flex items-center gap-4 p-4 text-left active:scale-[0.98] transition-all duration-150 hover:border-white/10 animate-stagger-in cursor-pointer`}
+                  className={`flex-1 glass-card rounded-2xl flex items-center gap-4 p-5 text-left active:scale-[0.98] transition-all duration-150 hover:border-white/10 animate-stagger-in cursor-pointer`}
                   style={{ animationDelay: `${idx * 0.05}s` }}
                 >
                   {/* Number / Action badge */}
@@ -416,7 +416,7 @@ function WorkoutContent() {
                   placeholder="Contoh: Barbell Curl Kustom"
                   value={newExName}
                   onChange={(e) => setNewExName(e.target.value)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+                  className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45"
                   required
                 />
               </div>
@@ -428,7 +428,7 @@ function WorkoutContent() {
                     placeholder="Contoh: Bicep"
                     value={newExMuscle}
                     onChange={(e) => setNewExMuscle(e.target.value)}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45"
                   />
                 </div>
                 <div>
@@ -438,7 +438,7 @@ function WorkoutContent() {
                     placeholder="Contoh: Barbell"
                     value={newExEquip}
                     onChange={(e) => setNewExEquip(e.target.value)}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45"
                   />
                 </div>
               </div>
@@ -450,7 +450,7 @@ function WorkoutContent() {
                     value={newExSets}
                     onChange={(e) => setNewExSets(Number(e.target.value))}
                     min={1}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 text-center"
                   />
                 </div>
                 <div>
@@ -459,7 +459,7 @@ function WorkoutContent() {
                     type="text" 
                     value={newExReps}
                     onChange={(e) => setNewExReps(e.target.value)}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 text-center"
                   />
                 </div>
                 <div>
@@ -469,7 +469,7 @@ function WorkoutContent() {
                     value={newExRest}
                     onChange={(e) => setNewExRest(Number(e.target.value))}
                     min={0}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 text-center"
                   />
                 </div>
               </div>
@@ -479,7 +479,7 @@ function WorkoutContent() {
                   placeholder="Contoh: Jaga siku tetap menempel, remas bicep di puncak..."
                   value={newExCue}
                   onChange={(e) => setNewExCue(e.target.value)}
-                  className="w-full h-14 bg-black/40 border border-base-border rounded-xl py-1.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 resize-none"
+                  className="w-full h-14 bg-black/40 border border-base-border rounded-xl py-1.5 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 resize-none"
                 />
               </div>
               <button
@@ -508,7 +508,7 @@ function WorkoutContent() {
                     type="text" 
                     value={editingExercise.name}
                     onChange={(e) => setEditingExercise({...editingExercise, name: e.target.value})}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45"
                   />
                 </div>
                 <div>
@@ -517,7 +517,7 @@ function WorkoutContent() {
                     type="text" 
                     value={editingExercise.targetMuscle}
                     onChange={(e) => setEditingExercise({...editingExercise, targetMuscle: e.target.value})}
-                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+                    className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45"
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-2">
@@ -527,7 +527,7 @@ function WorkoutContent() {
                       type="number" 
                       value={editingExercise.sets}
                       onChange={(e) => setEditingExercise({...editingExercise, sets: Number(e.target.value)})}
-                      className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                      className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 text-center"
                     />
                   </div>
                   <div>
@@ -536,7 +536,7 @@ function WorkoutContent() {
                       type="text" 
                       value={editingExercise.reps}
                       onChange={(e) => setEditingExercise({...editingExercise, reps: e.target.value})}
-                      className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                      className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 text-center"
                     />
                   </div>
                   <div>
@@ -545,7 +545,7 @@ function WorkoutContent() {
                       type="number" 
                       value={editingExercise.restSeconds}
                       onChange={(e) => setEditingExercise({...editingExercise, restSeconds: Number(e.target.value)})}
-                      className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                      className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 text-center"
                     />
                   </div>
                 </div>
@@ -554,7 +554,7 @@ function WorkoutContent() {
                   <textarea 
                     value={editingExercise.cue}
                     onChange={(e) => setEditingExercise({...editingExercise, cue: e.target.value})}
-                    className="w-full h-16 bg-black/40 border border-base-border rounded-xl py-1.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 resize-none text-left"
+                    className="w-full h-16 bg-black/40 border border-base-border rounded-xl py-1.5 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45 resize-none text-left"
                   />
                 </div>
                 <button

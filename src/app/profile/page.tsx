@@ -123,73 +123,73 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
-      <main className="pt-safe pt-8 pb-6 px-5 max-w-md mx-auto">
+      <main className="pt-safe pt-8 pb-10 px-4 sm:px-6 lg:px-8 max-w-lg mx-auto">
         {/* Header */}
-        <div className="mb-6 flex justify-between items-end animate-slide-down-fade">
+        <div className="mb-8 flex justify-between items-end animate-slide-down-fade">
           <div>
-            <p className="text-white/35 text-xs font-bold uppercase tracking-widest mb-1">Your Space</p>
-            <h1 className="heading-brutal text-3xl">Pro<span className="text-gradient-lime">file</span></h1>
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1.5">Your Space</p>
+            <h1 className="heading-brutal text-3xl sm:text-4xl">Pro<span className="text-gradient-lime">file</span></h1>
           </div>
         </div>
 
         {/* Profile Card */}
-        <div className="glass-card p-6 mb-6 animate-scale-in">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="glass-card p-6 lg:p-8 mb-8 animate-scale-in rounded-[2rem]">
+          <div className="flex items-center gap-5 mb-8">
             <div className="relative group shrink-0">
               <label className="block cursor-pointer">
-                <div className="h-16 w-16 rounded-full bg-lime/10 border border-lime/20 flex items-center justify-center text-lime overflow-hidden relative" style={{ height: '64px', width: '64px', minWidth: '64px', minHeight: '64px' }}>
+                <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-lime/10 border-2 border-lime/20 flex items-center justify-center text-lime overflow-hidden relative shadow-[0_4px_20px_rgba(204,255,0,0.15)] transition-transform hover:scale-105" style={{ minWidth: '80px', minHeight: '80px' }}>
                   {profile?.profileImage ? (
-                    <img src={profile.profileImage} alt="Profile" className="object-cover" style={{ height: '64px', width: '64px', display: 'block' }} />
+                    <img src={profile.profileImage} alt="Profile" className="object-cover h-full w-full block" />
                   ) : (
-                    <User size={32} />
+                    <User size={40} className="lg:w-12 lg:h-12" />
                   )}
                   {/* Overlay camera on hover */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-200">
-                    <Camera size={16} />
+                    <Camera size={24} />
                   </div>
                 </div>
                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
               </label>
             </div>
             <div>
-              <h2 className="heading-brutal text-xl text-white">{name || "Gym Member"}</h2>
-              <p className="text-white/40 text-xs uppercase tracking-wider mt-1">{profile?.experience} &middot; {profile?.goal}</p>
+              <h2 className="heading-brutal text-2xl lg:text-3xl text-white mb-1">{name || "Gym Member"}</h2>
+              <p className="text-white/50 text-xs sm:text-sm uppercase tracking-wider font-semibold">{profile?.experience} &middot; {profile?.goal}</p>
             </div>
           </div>
 
           {error && (
-            <div className="bg-ember/10 border border-ember/20 rounded-xl p-3.5 mb-5 flex items-start gap-2.5">
-              <AlertCircle size={16} className="text-ember shrink-0 mt-0.5" />
-              <p className="text-xs text-white/80 leading-normal">{error}</p>
+            <div className="bg-ember/10 border border-ember/20 rounded-xl p-4 mb-6 flex items-start gap-3">
+              <AlertCircle size={18} className="text-ember shrink-0 mt-0.5" />
+              <p className="text-sm text-white/80 leading-normal">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="bg-lime/10 border border-lime/20 rounded-xl p-3.5 mb-5 flex items-start gap-2.5">
-              <div className="h-4.5 w-4.5 rounded-full bg-lime text-black flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">✓</div>
-              <p className="text-xs text-lime leading-normal">{success}</p>
+            <div className="bg-lime/10 border border-lime/20 rounded-xl p-4 mb-6 flex items-start gap-3">
+              <div className="h-5 w-5 rounded-full bg-lime text-black flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">✓</div>
+              <p className="text-sm text-lime leading-normal font-medium">{success}</p>
             </div>
           )}
 
-          <form onSubmit={handleSave} className="space-y-4">
+          <form onSubmit={handleSave} className="space-y-5 max-w-md mx-auto">
             <div>
-              <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Nama Lengkap</label>
+              <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Nama Lengkap</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45"
+                className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-4 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors min-h-[48px]"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Gender</label>
+                <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Gender</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value as any)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 cursor-pointer"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-4 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors cursor-pointer min-h-[48px]"
                 >
                   <option value="male" className="bg-[#111]">Pria</option>
                   <option value="female" className="bg-[#111]">Wanita</option>
@@ -197,11 +197,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Goal Fisik</label>
+                <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Goal Fisik</label>
                 <select
                   value={goal}
                   onChange={(e) => setGoal(e.target.value as any)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 cursor-pointer"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-4 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors cursor-pointer min-h-[48px]"
                 >
                   <option value="maintenance" className="bg-[#111]">Maintenance</option>
                   <option value="cutting" className="bg-[#111]">Cutting</option>
@@ -213,45 +213,45 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Berat (kg)</label>
+                <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Berat (kg)</label>
                 <input
                   type="number"
                   value={weightKg}
                   onChange={(e) => setWeightKg(e.target.value)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-3 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors text-center min-h-[48px]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Tinggi (cm)</label>
+                <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Tinggi (cm)</label>
                 <input
                   type="number"
                   value={heightCm}
                   onChange={(e) => setHeightCm(e.target.value)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-3 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors text-center min-h-[48px]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Body Fat (%)</label>
+                <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Body Fat (%)</label>
                 <input
                   type="number"
                   value={bodyFatPct}
                   onChange={(e) => setBodyFatPct(e.target.value)}
-                  className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 text-center"
+                  className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-3 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors text-center min-h-[48px]"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5 tracking-wider">Tingkat Pengalaman</label>
+              <label className="block text-[11px] font-bold uppercase text-white/40 mb-2 tracking-wider ml-1">Tingkat Pengalaman</label>
               <select
                 value={experience}
                 onChange={(e) => setExperience(e.target.value as any)}
-                className="w-full bg-black/40 border border-base-border rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-lime/45 cursor-pointer"
+                className="w-full bg-black/40 border border-base-border rounded-2xl py-3 px-4 text-sm text-white focus:outline-none focus:border-lime/50 transition-colors cursor-pointer min-h-[48px]"
               >
                 <option value="beginner" className="bg-[#111]">Beginner</option>
                 <option value="intermediate" className="bg-[#111]">Intermediate</option>
@@ -262,16 +262,16 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full btn-primary py-3 text-xs font-extrabold hover:scale-102 active:scale-98 transition-all flex items-center justify-center gap-2"
+              className="w-full btn-primary min-h-[52px] rounded-full text-[15px] font-extrabold hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 mt-2"
             >
               {saving ? (
                 <>
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   Menyimpan...
                 </>
               ) : (
                 <>
-                  <Save size={14} />
+                  <Save size={18} />
                   Simpan Perubahan
                 </>
               )}
@@ -280,20 +280,20 @@ export default function ProfilePage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3">
+        <div className="space-y-4 max-w-md mx-auto">
           <button
             onClick={handleSignOut}
-            className="w-full py-3.5 px-4 bg-white/5 border border-white/10 hover:border-white/20 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
+            className="w-full py-4 px-5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-3 active:scale-95 transition-all min-h-[52px]"
           >
-            <LogOut size={14} className="text-white/60" />
+            <LogOut size={18} className="text-white/60" />
             Keluar dari Akun (Sign Out)
           </button>
 
           <button
             onClick={handleDeleteAccount}
-            className="w-full py-3.5 px-4 bg-ember/10 border border-ember/25 text-ember hover:bg-ember/20 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 active:scale-98 transition-all"
+            className="w-full py-4 px-5 bg-ember/10 hover:bg-ember/20 border border-ember/25 text-ember rounded-2xl font-bold text-sm flex items-center justify-center gap-3 active:scale-95 transition-all min-h-[52px]"
           >
-            <Trash2 size={14} />
+            <Trash2 size={18} />
             Hapus Akun Permanen
           </button>
         </div>

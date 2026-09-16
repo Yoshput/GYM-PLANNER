@@ -47,7 +47,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Main Hero Content ── */}
-      <section className="relative flex-1 flex flex-col lg:flex-row items-center justify-center gap-12 px-6 pt-12 pb-16 max-w-6xl mx-auto w-full">
+      <section className="relative flex-1 flex flex-col lg:flex-row items-center justify-center gap-12 px-6 lg:px-8 pt-12 lg:pt-20 pb-16 max-w-5xl mx-auto w-full">
         {/* Left column: Headings and CTAs */}
         <div className="flex-1 text-left relative z-10 max-w-xl animate-fade-in">
           {/* Brand header */}
@@ -86,14 +86,14 @@ export default function LandingPage() {
             <button
               onClick={() => router.push("/signup")}
               id="get-started-btn"
-              className="btn-primary text-base px-8 py-4 animate-glow-pulse-lime w-full sm:w-auto font-extrabold hover:scale-105 active:scale-95 transition-transform"
+              className="btn-primary text-base lg:text-lg px-8 py-4 lg:px-10 lg:py-5 animate-glow-pulse-lime w-full sm:w-auto font-extrabold hover:scale-105 active:scale-95 transition-transform"
             >
               Mulai Sekarang
               <ArrowRight size={20} />
             </button>
             <button
               onClick={() => router.push("/signup")}
-              className="btn-secondary text-base px-8 py-4 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white/5"
+              className="btn-secondary text-base lg:text-lg px-8 py-4 lg:px-10 lg:py-5 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white/5"
             >
               <Users size={18} className="text-white/60" />
               Gabung Komunitas
@@ -157,11 +157,11 @@ export default function LandingPage() {
       </section>
 
       {/* ── Feature strip using Unsplash previews ── */}
-      <section className="relative max-w-6xl mx-auto w-full px-6 pb-12">
+      <section className="relative max-w-5xl mx-auto w-full px-6 lg:px-8 pb-12 lg:pb-24">
         <h2 className="text-center font-display font-extrabold text-sm uppercase tracking-widest text-white/40 mb-6 flex items-center justify-center gap-2">
           <Sparkles size={14} className="text-lime" /> Fitur Unggulan Program <Sparkles size={14} className="text-lime" />
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           <InteractiveFeatureCard
             image="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80"
             icon={<CalendarCheck size={20} />}
@@ -214,7 +214,7 @@ interface InteractiveFeatureCardProps {
 
 function InteractiveFeatureCard({ image, icon, title, desc, tag }: InteractiveFeatureCardProps) {
   return (
-    <div className="group relative rounded-3xl overflow-hidden bg-base-card/45 border border-base-border/70 hover:border-lime/20 shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <div className="group relative rounded-2xl overflow-hidden bg-base-card/45 border border-base-border/70 hover:border-lime/20 shadow-lg transition-all duration-300 hover:-translate-y-1">
       {/* Background Image overlay */}
       <div className="absolute inset-0 z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
         <img src={image} alt={title} className="w-full h-full object-cover" />

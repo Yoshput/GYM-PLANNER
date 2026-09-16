@@ -124,6 +124,7 @@ html {
   -webkit-tap-highlight-color: transparent;
   /* iOS Safari: smooth momentum scrolling */
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 /* ────────────────────────────────────────────
@@ -241,6 +242,7 @@ body {
     border: 1px solid var(--color-base-border);
     border-radius: 1.25rem;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
   }
 
   .glass-card-hover {
@@ -351,3 +353,46 @@ html.light nav[aria-label="Primary navigation"] .bg-base-card\/80 {
   border-color: #E2E8F0 !important;
 }
 
+/* --- Added by redsign request --- */
+.page-container {
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .page-container {
+    max-width: 42rem; /* max-w-2xl */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.animate-slide-up, .animate-scale-in, .animate-fade-in {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.safe-top {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}
+.safe-bottom {
+  padding-bottom: max(5rem, calc(env(safe-area-inset-bottom) + 4rem));
+}
+
+.desktop-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .desktop-layout {
+    grid-template-columns: 280px 1fr;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+}
+
+.press-effect {
+  transition: transform 0.1s ease;
+}
+.press-effect:active {
+  transform: scale(0.97);
+}

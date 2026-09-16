@@ -144,33 +144,33 @@ function ProgressContent() {
   }, [logs]);
 
   return (
-    <main className="px-5 pt-safe pt-8 pb-6 max-w-md mx-auto">
+    <main className="px-4 sm:px-6 lg:px-8 pt-safe pt-8 pb-10 max-w-2xl mx-auto">
       {/* ── Header ── */}
-      <div className="mb-6 animate-slide-down-fade">
-        <p className="text-white/35 text-xs font-bold uppercase tracking-widest mb-1">Body Changes</p>
-        <h1 className="heading-brutal text-3xl">
+      <div className="mb-8 animate-slide-down-fade lg:mb-10 text-center sm:text-left">
+        <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1.5">Body Changes</p>
+        <h1 className="heading-brutal text-3xl sm:text-4xl">
           Pro<span className="text-gradient-lime">gress</span>
         </h1>
       </div>
 
       {/* ── Sub Navigation Tabs ── */}
-      <div className="flex gap-2 p-1 bg-base-raised/60 rounded-xl mb-6">
+      <div className="flex gap-2 p-1.5 bg-base-raised/60 rounded-[1.25rem] mb-8 max-w-sm mx-auto sm:mx-0">
         <button
           onClick={() => setActiveTab("stats")}
-          className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+          className={`flex-1 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
             activeTab === "stats"
-              ? "bg-lime text-black shadow-[0_0_12px_rgba(204,255,0,0.25)]"
-              : "text-white/50 hover:text-white"
+              ? "bg-lime text-black shadow-[0_4px_16px_rgba(204,255,0,0.25)]"
+              : "text-white/50 hover:text-white/80 active:scale-95"
           }`}
         >
           Pengukuran Tubuh
         </button>
         <button
           onClick={() => setActiveTab("photos")}
-          className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+          className={`flex-1 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
             activeTab === "photos"
-              ? "bg-lime text-black shadow-[0_0_12px_rgba(204,255,0,0.25)]"
-              : "text-white/50 hover:text-white"
+              ? "bg-lime text-black shadow-[0_4px_16px_rgba(204,255,0,0.25)]"
+              : "text-white/50 hover:text-white/80 active:scale-95"
           }`}
         >
           Foto Progres
@@ -179,14 +179,14 @@ function ProgressContent() {
 
       {/* ── STATS TAB ── */}
       {activeTab === "stats" && (
-        <div className="space-y-5 animate-fade-in">
+        <div className="space-y-6 lg:space-y-8 animate-fade-in">
           {/* Sparkles motivator card */}
           {logs.length > 1 && (
-            <div className="glass-card p-4 border-lime/20 bg-lime/3 flex items-center gap-3">
-              <Sparkles className="text-lime shrink-0" size={18} />
-              <p className="text-xs text-white/70 leading-normal">
+            <div className="glass-card p-5 border-lime/20 bg-lime/5 flex items-start gap-4 rounded-2xl">
+              <Sparkles className="text-lime shrink-0 mt-0.5" size={20} />
+              <p className="text-sm text-white/80 leading-relaxed">
                 Beban badan Anda telah bergeser sebesar{" "}
-                <strong className="text-lime">
+                <strong className="text-lime text-base mx-1">
                   {Math.abs(logs[0].weightKg - logs[logs.length - 1].weightKg).toFixed(1)} kg
                 </strong>{" "}
                 sejak pengukuran pertama. Konsistensi membuahkan hasil!
@@ -195,11 +195,11 @@ function ProgressContent() {
           )}
 
           {/* Weight graph */}
-          <div className="glass-card p-5 relative overflow-hidden">
-            <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-4">Tren Berat Badan (7 Entri Terakhir)</p>
+          <div className="glass-card p-6 lg:p-8 relative overflow-hidden rounded-[2rem]">
+            <p className="text-xs lg:text-sm font-bold uppercase tracking-widest text-white/40 mb-6">Tren Berat Badan (7 Entri Terakhir)</p>
             {logs.length > 1 ? (
-              <div className="relative pt-2">
-                <svg viewBox="0 0 360 120" className="w-full overflow-visible">
+              <div className="relative pt-2 w-full max-w-full overflow-hidden">
+                <svg viewBox="0 0 360 120" className="w-full h-auto overflow-visible transform translate-z-0">
                   {/* Fill Area beneath line chart */}
                   <path
                     d={`M 20,105 L ${chartPoints} L 340,105 Z`}
@@ -223,50 +223,50 @@ function ProgressContent() {
                   </defs>
                 </svg>
                 {/* Labels row */}
-                <div className="flex justify-between text-[10px] text-white/35 mt-2 font-bold px-4">
+                <div className="flex justify-between text-xs text-white/40 mt-4 font-bold px-2 sm:px-6">
                   <span>Mulai</span>
                   <span>Terbaru ({logs[0].weightKg}kg)</span>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-white/35 text-xs">
+              <div className="text-center py-10 text-white/40 text-sm">
                 Grafik akan tampil setelah Anda memiliki minimal 2 log berat badan.
               </div>
             )}
           </div>
 
           {/* Quick Logs list */}
-          <div className="glass-card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-white/35 flex items-center gap-1">
-                <Scale size={14} className="text-lime" /> Riwayat Ukuran
+          <div className="glass-card p-6 lg:p-8 rounded-[2rem]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <p className="text-xs lg:text-sm font-bold uppercase tracking-widest text-white/40 flex items-center gap-2">
+                <Scale size={16} className="text-lime" /> Riwayat Ukuran
               </p>
               <button
                 onClick={() => setShowLogModal(true)}
-                className="bg-lime/10 border border-lime/25 text-lime hover:bg-lime/25 px-3.5 py-1.5 rounded-xl font-bold text-xs active:scale-95 transition-all flex items-center gap-1"
+                className="bg-lime/10 border border-lime/25 text-lime hover:bg-lime/20 min-h-[44px] px-4 rounded-xl font-bold text-sm active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <Plus size={12} /> Log Ukuran
+                <Plus size={16} /> Log Ukuran
               </button>
             </div>
 
             {logs.length === 0 ? (
-              <div className="text-center py-6 text-white/35 text-xs">
+              <div className="text-center py-8 text-white/40 text-sm">
                 Belum ada ukuran tubuh yang dicatat.
               </div>
             ) : (
-              <div className="space-y-3.5 max-h-[300px] overflow-y-auto scrollbar-none pr-1">
+              <div className="space-y-4 max-h-[400px] overflow-y-auto scrollbar-none pr-2">
                 {logs.map((log, idx) => (
-                  <div key={idx} className="p-3 rounded-xl bg-base-raised/40 border border-base-border/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] text-white/30 font-bold uppercase">{log.date}</span>
-                      <span className="font-display font-black text-sm text-lime">{log.weightKg} kg</span>
+                  <div key={idx} className="p-4 rounded-2xl bg-base-raised/40 border border-base-border/50">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[11px] text-white/40 font-bold uppercase tracking-wider">{log.date}</span>
+                      <span className="font-display font-black text-lg text-lime">{log.weightKg} kg</span>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-[10px] text-white/60">
-                      {log.bodyFatPct && <span>💧 BF: {log.bodyFatPct}%</span>}
-                      {log.chestCm && <span>📏 Dada: {log.chestCm}cm</span>}
-                      {log.waistCm && <span>📏 Pinggang: {log.waistCm}cm</span>}
-                      {log.armCm && <span>📏 Lengan: {log.armCm}cm</span>}
-                      {log.thighCm && <span>📏 Paha: {log.thighCm}cm</span>}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px] text-white/60">
+                      {log.bodyFatPct && <span className="bg-black/20 p-2 rounded-lg">💧 BF: <span className="text-white/90 font-bold">{log.bodyFatPct}%</span></span>}
+                      {log.chestCm && <span className="bg-black/20 p-2 rounded-lg">📏 Dada: <span className="text-white/90 font-bold">{log.chestCm}cm</span></span>}
+                      {log.waistCm && <span className="bg-black/20 p-2 rounded-lg">📏 Pinggang: <span className="text-white/90 font-bold">{log.waistCm}cm</span></span>}
+                      {log.armCm && <span className="bg-black/20 p-2 rounded-lg">📏 Lengan: <span className="text-white/90 font-bold">{log.armCm}cm</span></span>}
+                      {log.thighCm && <span className="bg-black/20 p-2 rounded-lg">📏 Paha: <span className="text-white/90 font-bold">{log.thighCm}cm</span></span>}
                     </div>
                   </div>
                 ))}
@@ -278,16 +278,16 @@ function ProgressContent() {
 
       {/* ── PHOTOS TAB ── */}
       {activeTab === "photos" && (
-        <div className="space-y-5 animate-fade-in">
+        <div className="space-y-6 lg:space-y-8 animate-fade-in">
           {/* Before After Interactive Slider */}
           {photos.length >= 2 ? (
-            <div className="glass-card p-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-4 flex items-center justify-between">
+            <div className="glass-card p-6 lg:p-8 rounded-[2rem]">
+              <p className="text-xs lg:text-sm font-bold uppercase tracking-widest text-white/40 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <span>Before vs After Slider</span>
-                <span className="text-lime text-[10px] font-extrabold flex items-center gap-1"><Sparkles size={10} /> INTERAKTIF</span>
+                <span className="text-lime text-[11px] font-extrabold flex items-center gap-1.5 bg-lime/10 px-3 py-1 rounded-full w-fit"><Sparkles size={12} /> INTERAKTIF</span>
               </p>
               
-              <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-black/60 border border-base-border">
+              <div className="relative aspect-[3/4] sm:aspect-square md:aspect-[4/3] lg:aspect-[16/9] w-full rounded-3xl overflow-hidden bg-black/60 border border-base-border transform translate-z-0">
                 {/* Before Image (Left / Base) */}
                 {photos[photos.length - 1].frontImage && (
                   <img
@@ -296,7 +296,7 @@ function ProgressContent() {
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 )}
-                <div className="absolute top-3 left-3 bg-black/65 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[9px] font-bold text-white uppercase tracking-wider">
+                <div className="absolute top-4 left-4 bg-black/65 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider">
                   Before ({photos[photos.length - 1].date})
                 </div>
 
@@ -310,19 +310,23 @@ function ProgressContent() {
                       src={photos[0].frontImage}
                       alt="After"
                       className="absolute top-0 right-0 h-full object-cover"
-                      style={{ width: "360px", maxWidth: "none" }} // Ensure width aligns with standard card
+                      style={{ width: "100vw", maxWidth: "1000px" }} // Changed to allow scaling
                     />
                   </div>
                 )}
-                <div className="absolute top-3 right-3 bg-lime/10 border border-lime/25 backdrop-blur-md px-2.5 py-1 rounded-lg text-[9px] font-bold text-lime uppercase tracking-wider">
+                <div className="absolute top-4 right-4 bg-lime/10 border border-lime/25 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold text-lime uppercase tracking-wider">
                   After ({photos[0].date})
                 </div>
 
                 {/* Drag Slider line indicator */}
                 <div
-                  className="absolute inset-y-0 w-0.5 bg-lime drop-shadow-[0_0_8px_rgba(204,255,0,0.8)] pointer-events-none"
+                  className="absolute inset-y-0 w-0.5 bg-lime drop-shadow-[0_0_12px_rgba(204,255,0,0.8)] pointer-events-none"
                   style={{ left: `${beforeAfterSliderValue}%` }}
-                />
+                >
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-8 bg-lime rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(204,255,0,0.5)]">
+                    <div className="w-1 h-4 bg-black rounded-full" />
+                  </div>
+                </div>
                 
                 {/* Drag control slider overlay input */}
                 <input
@@ -334,47 +338,47 @@ function ProgressContent() {
                   className="absolute inset-0 opacity-0 cursor-ew-resize w-full h-full"
                 />
               </div>
-              <p className="text-[10px] text-white/35 text-center mt-2.5">Geser jari atau kursor Anda di atas foto untuk membandingkan</p>
+              <p className="text-xs text-white/40 text-center mt-4">Geser jari atau kursor Anda di atas foto untuk membandingkan</p>
             </div>
           ) : (
-            <div className="glass-card p-6 text-center text-white/35 text-xs">
+            <div className="glass-card p-8 lg:p-12 text-center text-white/40 text-sm rounded-[2rem]">
               Upload minimal 2 foto progres untuk menggunakan Sebelum & Sesudah slider.
             </div>
           )}
 
           {/* Photo Gallery List */}
-          <div className="glass-card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-white/35 flex items-center gap-1">
-                <Camera size={14} className="text-lime" /> Galeri Foto
+          <div className="glass-card p-6 lg:p-8 rounded-[2rem]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <p className="text-xs lg:text-sm font-bold uppercase tracking-widest text-white/40 flex items-center gap-2">
+                <Camera size={16} className="text-lime" /> Galeri Foto
               </p>
               <button
                 onClick={() => setShowPhotoModal(true)}
-                className="bg-lime text-black hover:bg-lime-dim px-3.5 py-1.5 rounded-xl font-bold text-xs active:scale-95 transition-all flex items-center gap-1 shadow-[0_0_12px_rgba(204,255,0,0.3)]"
+                className="bg-lime text-black hover:bg-lime-dim min-h-[44px] px-5 rounded-full font-bold text-sm active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(204,255,0,0.3)]"
               >
-                <Upload size={12} /> Upload Foto
+                <Upload size={16} /> Upload Foto
               </button>
             </div>
 
             {photos.length === 0 ? (
-              <div className="text-center py-6 text-white/35 text-xs">
+              <div className="text-center py-10 text-white/40 text-sm">
                 Belum ada foto progres yang di-upload.
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3.5 max-h-[350px] overflow-y-auto scrollbar-none">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto scrollbar-none pb-2">
                 {photos.map((photo, idx) => (
-                  <div key={photo.id} className="relative rounded-xl overflow-hidden border border-base-border/70 group aspect-[4/5] bg-black/40">
+                  <div key={photo.id} className="relative rounded-2xl overflow-hidden border border-base-border/70 group aspect-[4/5] bg-black/40">
                     {photo.frontImage && (
-                      <img src={photo.frontImage} alt="Progress" className="h-full w-full object-cover" />
+                      <img src={photo.frontImage} alt="Progress" className="h-full w-full object-cover transform transition-transform group-hover:scale-105" />
                     )}
                     
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-2 flex items-center justify-between">
-                      <span className="text-[8px] font-extrabold text-white/70 uppercase tracking-widest">{photo.date}</span>
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 flex items-center justify-between">
+                      <span className="text-[10px] font-extrabold text-white/80 uppercase tracking-widest">{photo.date}</span>
                       <button
                         onClick={() => handleDeletePhoto(photo.id)}
-                        className="text-ember hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-ember/70 hover:text-red-400 p-2 rounded-full hover:bg-black/50 opacity-0 group-hover:opacity-100 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
@@ -387,82 +391,82 @@ function ProgressContent() {
 
       {/* ── Log Measure Modal ── */}
       {showLogModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-5 animate-fade-in">
-          <div className="glass-card w-full max-w-sm p-6 relative shimmer-border animate-scale-up">
-            <h3 className="heading-brutal text-xl mb-1">Catat Ukuran Tubuh</h3>
-            <p className="text-white/40 text-xs mb-5">Simpan data fisik terbaru Anda:</p>
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="glass-card w-full max-w-md p-6 lg:p-8 relative shimmer-border animate-scale-up rounded-[2rem]">
+            <h3 className="heading-brutal text-2xl mb-2">Catat Ukuran Tubuh</h3>
+            <p className="text-white/50 text-sm mb-6">Simpan data fisik terbaru Anda:</p>
             
-            <div className="grid grid-cols-2 gap-3.5 mb-5">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="col-span-2">
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-1">Berat Badan (wajib)</label>
-                <div className="flex items-center bg-black/40 rounded-xl border border-white/5 px-3 py-2">
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Berat Badan (wajib)</label>
+                <div className="flex items-center bg-black/40 rounded-2xl border border-white/10 px-4 py-2 min-h-[52px]">
                   <input
                     type="number"
                     step="0.1"
                     placeholder="65.0"
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
-                    className="w-full bg-transparent font-bold text-lime focus:outline-none placeholder-white/20"
+                    className="w-full bg-transparent font-bold text-lg text-lime focus:outline-none placeholder-white/20"
                   />
-                  <span className="text-xs text-white/45 ml-1">kg</span>
+                  <span className="text-sm font-bold text-white/40 ml-2">kg</span>
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-1">Body Fat %</label>
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Body Fat %</label>
                 <input
                   type="number"
                   placeholder="15%"
                   value={bodyFat}
                   onChange={(e) => setBodyFat(e.target.value)}
-                  className="w-full bg-black/40 rounded-xl border border-white/5 px-3 py-2 text-white font-bold focus:outline-none"
+                  className="w-full bg-black/40 rounded-2xl border border-white/10 px-4 py-3 min-h-[48px] text-white font-bold focus:outline-none focus:border-lime/50 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-1">Lingkar Dada</label>
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Lingkar Dada</label>
                 <input
                   type="number"
                   placeholder="95 cm"
                   value={chest}
                   onChange={(e) => setChest(e.target.value)}
-                  className="w-full bg-black/40 rounded-xl border border-white/5 px-3 py-2 text-white font-bold focus:outline-none"
+                  className="w-full bg-black/40 rounded-2xl border border-white/10 px-4 py-3 min-h-[48px] text-white font-bold focus:outline-none focus:border-lime/50 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-1">Lingkar Pinggang</label>
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Lingkar Pinggang</label>
                 <input
                   type="number"
                   placeholder="80 cm"
                   value={waist}
                   onChange={(e) => setWaist(e.target.value)}
-                  className="w-full bg-black/40 rounded-xl border border-white/5 px-3 py-2 text-white font-bold focus:outline-none"
+                  className="w-full bg-black/40 rounded-2xl border border-white/10 px-4 py-3 min-h-[48px] text-white font-bold focus:outline-none focus:border-lime/50 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-1">Lingkar Lengan</label>
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Lingkar Lengan</label>
                 <input
                   type="number"
                   placeholder="34 cm"
                   value={arm}
                   onChange={(e) => setArm(e.target.value)}
-                  className="w-full bg-black/40 rounded-xl border border-white/5 px-3 py-2 text-white font-bold focus:outline-none"
+                  className="w-full bg-black/40 rounded-2xl border border-white/10 px-4 py-3 min-h-[48px] text-white font-bold focus:outline-none focus:border-lime/50 transition-colors"
                 />
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowLogModal(false)}
-                className="flex-1 bg-white/5 border border-white/10 text-white/70 rounded-xl py-2.5 font-bold text-xs"
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 rounded-full min-h-[52px] font-bold text-sm transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleSaveLogs}
-                className="flex-1 bg-lime text-black rounded-xl py-2.5 font-bold text-xs shadow-[0_0_12px_rgba(204,255,0,0.3)]"
+                className="flex-1 bg-lime text-black rounded-full min-h-[52px] font-extrabold text-sm shadow-[0_4px_16px_rgba(204,255,0,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
               >
                 Simpan Log
               </button>
@@ -473,21 +477,21 @@ function ProgressContent() {
 
       {/* ── Log Photo Modal ── */}
       {showPhotoModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-5 animate-fade-in">
-          <div className="glass-card w-full max-w-sm p-6 relative shimmer-border animate-scale-up">
-            <h3 className="heading-brutal text-xl mb-1">Upload Foto Progres</h3>
-            <p className="text-white/40 text-xs mb-5">Simpan potret visual bentuk tubuh Anda:</p>
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="glass-card w-full max-w-md p-6 lg:p-8 relative shimmer-border animate-scale-up rounded-[2rem]">
+            <h3 className="heading-brutal text-2xl mb-2">Upload Foto Progres</h3>
+            <p className="text-white/50 text-sm mb-6">Simpan potret visual bentuk tubuh Anda:</p>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-5 mb-8">
               <div>
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-2">Foto Depan (Wajib)</label>
-                <label className="border border-dashed border-white/20 hover:border-lime/45 cursor-pointer rounded-xl h-24 flex flex-col items-center justify-center bg-black/45 hover:bg-lime/3 text-white/45 transition-colors">
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Foto Depan (Wajib)</label>
+                <label className="border-2 border-dashed border-white/20 hover:border-lime/50 cursor-pointer rounded-2xl h-32 flex flex-col items-center justify-center bg-black/40 hover:bg-lime/5 text-white/50 transition-all">
                   {frontFile ? (
-                    <img src={frontFile} alt="Front preview" className="h-full w-full object-cover rounded-xl" />
+                    <img src={frontFile} alt="Front preview" className="h-full w-full object-cover rounded-2xl" />
                   ) : (
                     <>
-                      <Camera size={20} className="mb-1" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider">Pilih Foto</span>
+                      <Camera size={28} className="mb-2 text-white/40" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Pilih Foto</span>
                     </>
                   )}
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageSelect(e, "front")} />
@@ -495,14 +499,14 @@ function ProgressContent() {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-white/45 uppercase tracking-wide block mb-2">Foto Samping (Opsional)</label>
-                <label className="border border-dashed border-white/20 hover:border-lime/45 cursor-pointer rounded-xl h-24 flex flex-col items-center justify-center bg-black/45 hover:bg-lime/3 text-white/45 transition-colors">
+                <label className="text-[11px] font-bold text-white/50 uppercase tracking-wide block mb-2 ml-1">Foto Samping (Opsional)</label>
+                <label className="border-2 border-dashed border-white/20 hover:border-lime/50 cursor-pointer rounded-2xl h-32 flex flex-col items-center justify-center bg-black/40 hover:bg-lime/5 text-white/50 transition-all">
                   {sideFile ? (
-                    <img src={sideFile} alt="Side preview" className="h-full w-full object-cover rounded-xl" />
+                    <img src={sideFile} alt="Side preview" className="h-full w-full object-cover rounded-2xl" />
                   ) : (
                     <>
-                      <Camera size={20} className="mb-1" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider">Pilih Foto</span>
+                      <Camera size={28} className="mb-2 text-white/40" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Pilih Foto</span>
                     </>
                   )}
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageSelect(e, "side")} />
@@ -510,20 +514,20 @@ function ProgressContent() {
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button
                 onClick={() => setShowPhotoModal(false)}
-                className="flex-1 bg-white/5 border border-white/10 text-white/70 rounded-xl py-2.5 font-bold text-xs"
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 rounded-full min-h-[52px] font-bold text-sm transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleSavePhoto}
                 disabled={!frontFile}
-                className={`flex-1 rounded-xl py-2.5 font-bold text-xs transition-all ${
+                className={`flex-1 rounded-full min-h-[52px] font-extrabold text-sm transition-all ${
                   frontFile
-                    ? "bg-lime text-black shadow-[0_0_12px_rgba(204,255,0,0.3)]"
-                    : "bg-white/5 text-white/20 border border-white/5 cursor-not-allowed"
+                    ? "bg-lime text-black shadow-[0_4px_16px_rgba(204,255,0,0.3)] hover:scale-[1.02] active:scale-95"
+                    : "bg-white/5 text-white/30 border border-white/10 cursor-not-allowed"
                 }`}
               >
                 Simpan Foto

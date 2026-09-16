@@ -605,7 +605,7 @@ function NutritionContent() {
                 type="button"
                 onTouchEnd={(e) => { e.preventDefault(); setShowAIScanner(true); setAiQuery(preset.query); runAIScan(preset.query); }}
                 onClick={() => { setShowAIScanner(true); setAiQuery(preset.query); runAIScan(preset.query); }}
-                className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-[11px] active:bg-lime/10 active:border-lime/30 active:text-lime transition-all touch-manipulation"
+                className="px-4 py-2 min-h-[44px] shrink-0 whitespace-nowrap rounded-full bg-white/5 border border-white/10 text-white/60 text-[13px] active:bg-lime/10 active:border-lime/30 active:text-lime transition-all touch-manipulation"
               >
                 {preset.label}
               </button>
@@ -614,8 +614,9 @@ function NutritionContent() {
         </div>
       </div>
 
-      {/* ── Water Tracker ── */}
-      <div className="glass-card p-4 mb-5 animate-stagger-in">
+      <div className="md:grid md:grid-cols-2 md:gap-5 mb-5">
+        {/* ── Water Tracker ── */}
+        <div className="glass-card p-4 mb-5 md:mb-0 animate-stagger-in">
         <div className="flex items-center gap-4">
           <div className={`h-10 w-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center shrink-0 transition-transform duration-200 ${waterBump ? "scale-125" : "scale-100"}`}>
             <Droplets size={18} className={waterPct >= 100 ? "text-lime" : "text-blue-400"} />
@@ -634,7 +635,7 @@ function NutritionContent() {
       </div>
 
       {/* ── Macro Breakdown ── */}
-      <div className="glass-card p-5 mb-5 animate-stagger-in">
+      <div className="glass-card p-5 animate-stagger-in">
         <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-4">Macro Targets</p>
         <div className="space-y-4">
           {macroRows.map((row) => {
@@ -665,11 +666,13 @@ function NutritionContent() {
         </div>
       </div>
 
+      </div>
+
       {/* ── Recent Logs ── */}
       {recentLogs.length > 0 && (
         <div className="glass-card p-4.5 mb-5 animate-stagger-in">
           <p className="text-xs font-bold uppercase tracking-widest text-white/35 mb-3 flex items-center gap-1.5"><History size={13} className="text-lime" /> Makanan Hari Ini ({recentLogs.length})</p>
-          <div className="space-y-2.5 max-h-44 overflow-y-auto scrollbar-none">
+          <div className="space-y-2.5 max-h-44 overflow-y-auto scrollbar-none lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
             {recentLogs.map((log, idx) => (
               <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-base-raised/40 border border-base-border/50 text-xs">
                 <div className="min-w-0 flex-1"><p className="font-bold text-white truncate">{log.name}</p><p className="text-white/40 text-[10px] mt-0.5">P {log.p}g · C {log.c}g · F {log.f}g</p></div>
@@ -735,7 +738,7 @@ function NutritionContent() {
             </div>
             <label className="block text-[9px] font-bold uppercase text-white/40 mb-2 text-center">Berapa gram yang Anda makan?</label>
             <div className="flex items-center justify-center gap-3 mb-4">
-              <input type="number" value={foodGramInput || ""} onChange={(e) => setFoodGramInput(Number(e.target.value))} className="w-24 bg-black/50 border-2 border-lime/45 rounded-xl py-2 px-3 text-center text-lg font-black text-lime focus:outline-none" min={1} max={2000} />
+              <input type="number" value={foodGramInput || ""} onChange={(e) => setFoodGramInput(Number(e.target.value))} className="w-24 bg-black/50 border-2 border-lime/45 rounded-xl py-2 px-3 text-center text-lg min-h-[44px] font-black text-lime focus:outline-none" min={1} max={2000} />
               <span className="text-white/60 font-bold text-sm">gram</span>
             </div>
             <div className="grid grid-cols-4 gap-2 mb-4">
@@ -856,15 +859,15 @@ function NutritionContent() {
             <form onSubmit={handleLogCustom} className="space-y-3">
               <div>
                 <label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Nama Makanan</label>
-                <input type="text" placeholder="Ayam Geprek Sambal Korek" value={customFoodName} onChange={(e) => setCustomFoodName(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45" required />
+                <input type="text" placeholder="Ayam Geprek Sambal Korek" value={customFoodName} onChange={(e) => setCustomFoodName(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45" required />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Kalori (kcal)</label><input type="number" placeholder="450" value={customFoodKcal} onChange={(e) => setCustomFoodKcal(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45" required /></div>
-                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Protein (g)</label><input type="number" placeholder="25" value={customFoodP} onChange={(e) => setCustomFoodP(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45" /></div>
+                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Kalori (kcal)</label><input type="number" placeholder="450" value={customFoodKcal} onChange={(e) => setCustomFoodKcal(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45" required /></div>
+                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Protein (g)</label><input type="number" placeholder="25" value={customFoodP} onChange={(e) => setCustomFoodP(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Karbohidrat (g)</label><input type="number" placeholder="40" value={customFoodC} onChange={(e) => setCustomFoodC(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45" /></div>
-                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Lemak (g)</label><input type="number" placeholder="12" value={customFoodF} onChange={(e) => setCustomFoodF(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-lime/45" /></div>
+                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Karbohidrat (g)</label><input type="number" placeholder="40" value={customFoodC} onChange={(e) => setCustomFoodC(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45" /></div>
+                <div><label className="block text-[9px] font-bold uppercase text-white/40 mb-1">Lemak (g)</label><input type="number" placeholder="12" value={customFoodF} onChange={(e) => setCustomFoodF(e.target.value)} className="w-full bg-black/40 border border-base-border rounded-xl py-2 px-3 text-base min-h-[44px] text-white focus:outline-none focus:border-lime/45" /></div>
               </div>
               <button type="submit" className="w-full btn-primary py-2.5 text-xs font-bold uppercase tracking-wider">Catat Makanan</button>
             </form>
