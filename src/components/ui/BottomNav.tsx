@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LayoutDashboard, Dumbbell, UtensilsCrossed, LineChart, User } from "lucide-react";
+import { motion } from "framer-motion";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -35,39 +36,39 @@ export default function BottomNav() {
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || pathname?.startsWith(href + "/");
               return (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex-1 flex flex-col items-center justify-center gap-1 py-3 min-h-[60px] relative active:scale-95 transition-transform duration-100 touch-manipulation"
-                >
-                  {/* Active background glow pill */}
-                  {active && (
-                    <span className="absolute inset-x-3 inset-y-1.5 rounded-2xl bg-lime/10 border border-lime/15 animate-scale-in" />
-                  )}
-
-                  {/* Icon with conditional glow */}
-                  <span className="relative flex items-center justify-center min-h-[24px]">
-                    <Icon
-                      size={24}
-                      className={`relative z-10 transition-all duration-200 ${
-                        active ? "text-lime drop-shadow-[0_0_8px_rgba(204,255,0,0.8)]" : "text-white/40"
-                      }`}
-                      strokeWidth={active ? 2.5 : 2}
-                    />
-                    {/* Glow ring under active icon */}
-                    {active && (
-                      <span className="absolute inset-0 rounded-full bg-lime/20 blur-md animate-glow-pulse-lime scale-150" />
-                    )}
-                  </span>
-
-                  <span
-                    className={`text-[10px] font-bold uppercase tracking-wide relative z-10 transition-colors duration-200 ${
-                      active ? "text-lime" : "text-white/40"
-                    }`}
+                <motion.div key={href} className="flex-1" whileTap={{ scale: 0.88 }} transition={{ duration: 0.12 }}>
+                  <Link
+                    href={href}
+                    className="flex flex-col items-center justify-center gap-1 py-3 min-h-[60px] relative touch-manipulation w-full"
                   >
-                    {label}
-                  </span>
-                </Link>
+                    {active && (
+                      <motion.span
+                        layoutId="bottomNavActive"
+                        className="absolute inset-x-3 inset-y-1.5 rounded-2xl bg-lime/10 border border-lime/15"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative flex items-center justify-center min-h-[24px]">
+                      <Icon
+                        size={24}
+                        className={`relative z-10 transition-colors duration-200 ${
+                          active ? "text-lime drop-shadow-[0_0_8px_rgba(204,255,0,0.8)]" : "text-white/40"
+                        }`}
+                        strokeWidth={active ? 2.5 : 2}
+                      />
+                      {active && (
+                        <span className="absolute inset-0 rounded-full bg-lime/20 blur-md animate-glow-pulse-lime scale-150" />
+                      )}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wide relative z-10 transition-colors duration-200 ${
+                        active ? "text-lime" : "text-white/40"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </Link>
+                </motion.div>
               );
             })}
           </div>

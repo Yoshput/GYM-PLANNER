@@ -8,11 +8,30 @@ import YosBot from "@/components/ui/YosBot";
 import { Dumbbell } from "lucide-react";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import IosInstallBanner from "@/components/ui/IosInstallBanner";
+import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: EASE_OUT },
+  },
+  exit: {
+    opacity: 0,
+    y: -6,
+    transition: { duration: 0.18, ease: "easeIn" as const },
+  },
+};
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { profile, isLoading, isAuthenticated } = useProfile();
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -27,7 +46,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   if (!mounted || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0B0B0F]">
-        <div className="flex flex-col items-center gap-3 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col items-center gap-3"
+        >
           {/* iOS-style minimal spinner */}
           <div className="relative h-12 w-12">
             <div className="h-12 w-12 rounded-full border-[3px] border-white/10 border-t-lime animate-spin" />
@@ -36,21 +60,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Loading</p>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
-  // If user is logged in but hasn't completed onboarding, force show the OnboardingModal
+  // If user is logged in but hasn't completed onboarding
   if (isAuthenticated && !profile) {
     return (
-      <div className="relative min-h-screen overflow-x-hidden bg-[#0A0A0E]">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative min-h-screen overflow-x-hidden bg-[#0A0A0E]"
+      >
         <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
           <div className="absolute inset-0 bg-grid-dots opacity-45" />
           <div className="absolute -top-40 -right-20 h-96 w-96 rounded-full bg-lime/15 blur-[120px]" />
         </div>
         <OnboardingModal onClose={() => {}} />
-      </div>
+      </motion.div>
     );
   }
 
@@ -65,27 +93,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-lime/3 blur-[120px]" />
       </div>
 
-      {/* ── Layout: flexbox for sidebar + content ── */}
-      {/*
-        BottomNav renders a React Fragment containing:
-        1. <nav> — mobile bottom nav (hidden on lg)
-        2. <aside> — desktop sidebar (hidden on mobile, flex on lg)
-
-        On desktop: the <aside> acts as the sidebar column (w-[280px] sticky).
-        The content div takes flex-1 and shifts right accordingly.
-      */}
+      {/* ── Flexbox layout: sidebar (desktop) + content ── */}
       <div className="relative flex min-h-screen">
-        {/* Sidebar lives here (BottomNav renders it as the <aside> on lg) */}
+        {/* BottomNav renders: fixed mobile nav + sticky desktop sidebar */}
         <BottomNav />
 
         {/* ── Main content column ── */}
-        <main
-          className="flex-1 min-w-0 pb-28 lg:pb-8 animate-fade-in"
-          style={{ minWidth: 0 }}
-        >
-          {/* Center content on desktop, full-width on mobile */}
+        <main className="flex-1 min-w-0 pb-28 lg:pb-8" style={{ minWidth: 0 }}>
+          {/* Center content on desktop */}
           <div className="max-w-2xl mx-auto w-full">
-            {children}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                variants={pageVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </main>
       </div>
